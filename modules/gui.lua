@@ -1248,6 +1248,15 @@ pfUI:RegisterModule("gui", function ()
         "3:300%",
         "4:400%",
       },
+      ["np_targetsymbolgap"] = {
+        "-8:-8",
+        "-4:-4",
+        "0:0",
+        "4:4",
+        "8:8",
+        "12:12",
+        "16:16",
+      },
       ["gryphons"] = {
         "None:"..T["None"],
         "Gryphon:"..T["Gryphon"],
@@ -2916,6 +2925,7 @@ pfUI:RegisterModule("gui", function ()
       CreateConfig(U["nameplates"], T["Red Name Text On Infight Units"], C.nameplates, "namefightcolor", "checkbox")
       CreateConfig(U["nameplates"], T["Target Nameplate Symbols"], C.nameplates, "targetsymbols", "dropdown", pfUI.gui.dropdowns.np_targetsymbols)
       CreateConfig(U["nameplates"], T["Target Nameplate Symbol Size"], C.nameplates, "targetsymbolsize", "dropdown", pfUI.gui.dropdowns.np_targetsymbolsize)
+      CreateConfig(U["nameplates"], T["Target Nameplate Symbol Gap"], C.nameplates, "targetsymbolgap", "dropdown", pfUI.gui.dropdowns.np_targetsymbolgap)
       CreateConfig(U["nameplates"], T["Zoom Target Nameplate"], C.nameplates, "targetzoom", "checkbox")
       CreateConfig(U["nameplates"], T["Target Nameplate Zoom Factor"], C.nameplates, "targetzoomval", "dropdown", pfUI.gui.dropdowns.percent_small)
       CreateConfig(U["nameplates"], T["Nameplate Width"], C.nameplates, "width")

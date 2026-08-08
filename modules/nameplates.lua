@@ -796,12 +796,11 @@ nameplates:RegisterEvent("PLAYER_GUILD_UPDATE")
     nameplate.level = nameplate:CreateFontString(nil, "OVERLAY")
     nameplate.level:SetPoint("RIGHT", nameplate.health, "LEFT", -3, 0)
 
+    -- anchored in the styling function below, so the gap follows the config
     nameplate.symbolleft = nameplate:CreateTexture(nil, "OVERLAY")
-    nameplate.symbolleft:SetPoint("RIGHT", nameplate.level, "LEFT", -4, 0)
     nameplate.symbolleft:Hide()
 
     nameplate.symbolright = nameplate:CreateTexture(nil, "OVERLAY")
-    nameplate.symbolright:SetPoint("LEFT", nameplate.health, "RIGHT", 4, 0)
     nameplate.symbolright:SetTexCoord(1, 0, 0, 1) -- mirror so it points inward
     nameplate.symbolright:Hide()
 
@@ -966,6 +965,14 @@ nameplates:RegisterEvent("PLAYER_GUILD_UPDATE")
     nameplate.symbolleft:SetHeight(symbolsize)
     nameplate.symbolright:SetWidth(symbolsize)
     nameplate.symbolright:SetHeight(symbolsize)
+
+    -- Gap between symbol and plate, in pixels: higher pushes the symbols out,
+    -- 0 butts them against the plate, negative overlaps. 4 is the original
+    -- spacing. The art is a round button whose circle fills the square, so
+    -- nearly all the apparent space is this offset, not padding in the texture.
+    local symbolgap = tonumber(C.nameplates.targetsymbolgap) or 4
+    nameplate.symbolleft:SetPoint("RIGHT", nameplate.level, "LEFT", -symbolgap, 0)
+    nameplate.symbolright:SetPoint("LEFT", nameplate.health, "RIGHT", symbolgap, 0)
     nameplate.raidicon:SetSize(C.nameplates.raidiconsize, C.nameplates.raidiconsize)
 
     for i=1,16 do
