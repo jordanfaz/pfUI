@@ -575,8 +575,13 @@ pfUI:RegisterModule("loot", function ()
       end
     end)
 
-    if C.loot.autoresize == "1" then
-      frame:SetScript("OnUpdate", function()
+    -- autoresize: one throttled updater on the loot frame instead of a full
+    -- UpdateLootFrame rebuild per slot button every frame (was N-squared per frame)
+    if C.loot.autoresize == "1" and not pfUI.loot.autoresizeHooked then
+      pfUI.loot.autoresizeHooked = true
+      pfUI.loot:SetScript("OnUpdate", function()
+        if (this.resizeTick or 0) > GetTime() then return end
+        this.resizeTick = GetTime() + 0.1
         pfUI.loot:UpdateLootFrame()
       end)
     end
