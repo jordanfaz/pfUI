@@ -125,6 +125,10 @@ pfUI:RegisterModule("nampower", function ()
       UpdateMovable(pfUI.reactive)
 
       pfUI.reactive:SetScript("OnUpdate", function()
+        -- throttle: reactive usability rarely changes within 0.1s; this saves up to
+        -- 3 IsSpellUsable DLL calls + Show/Hide churn every frame
+        if (this.tick or 0) > GetTime() then return end
+        this.tick = GetTime() + 0.1
         local anyVisible = false
         for _, icon in ipairs(this.icons) do
           local usable = C_Spell.IsSpellUsable(icon.spellName)
