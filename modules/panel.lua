@@ -498,7 +498,7 @@ pfUI:RegisterModule("panel", function()
           GameTooltip:ClearLines()
           GameTooltip_SetDefaultAnchor(GameTooltip, this)
           GameTooltip:SetInventoryItem("player", 0)
-          GameTooltip:AddLine(T["Count"] .. ": " .. ammo, .3,1,.8)
+          GameTooltip:AddLine(T["Count"] .. ": " .. ammo, pfUI.cr, pfUI.cg, pfUI.cb)
           GameTooltip:Show()
         end
       end

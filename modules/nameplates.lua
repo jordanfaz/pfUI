@@ -411,7 +411,7 @@ pfUI:RegisterModule("nameplates", function ()
     plate.debuffs[index]:SetFrameLevel(4)
 
     plate.debuffs[index].icon = plate.debuffs[index]:CreateTexture(nil, "BACKGROUND")
-    plate.debuffs[index].icon:SetTexture(.3,1,.8,1)
+    plate.debuffs[index].icon:SetTexture(pfUI.cr, pfUI.cg, pfUI.cb,1)
     plate.debuffs[index].icon:SetAllPoints(plate.debuffs[index])
 
     plate.debuffs[index].stacks = plate.debuffs[index]:CreateFontString(nil, "OVERLAY")

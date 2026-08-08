@@ -63,7 +63,7 @@ pfUI:RegisterModule("loothistory", function ()
 
   pfUI.loothistory.caption = pfUI.loothistory:CreateFontString("Status", "LOW", "GameFontNormal")
   pfUI.loothistory.caption:SetFont(pfUI.font_default, C.global.font_size + 4, "OUTLINE")
-  pfUI.loothistory.caption:SetTextColor(.2, 1, .8, 1)
+  pfUI.loothistory.caption:SetTextColor(pfUI.cr, pfUI.cg, pfUI.cb, 1)
   pfUI.loothistory.caption:SetPoint("TOP", 0, -10)
   pfUI.loothistory.caption:SetText(T["Loot History"])
 

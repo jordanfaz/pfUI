@@ -60,7 +60,7 @@ local function BuffOnEnter()
     local playerlist = aura and GetUnbuffedRoster(aura.name) or ""
     if strlen(playerlist) > 0 then
       GameTooltip:AddLine(" ")
-      GameTooltip:AddLine(T["Unbuffed"] .. ":", .3, 1, .8)
+      GameTooltip:AddLine(T["Unbuffed"] .. ":", pfUI.cr, pfUI.cg, pfUI.cb)
       GameTooltip:AddLine(playerlist,1,1,1,1)
       GameTooltip:Show()
     end

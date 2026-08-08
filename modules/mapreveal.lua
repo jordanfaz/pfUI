@@ -48,7 +48,7 @@ pfUI:RegisterModule("mapreveal", function ()
   local exploreEnter = function()
     WorldMapTooltip:ClearLines()
     WorldMapTooltip:SetOwner(this, "ANCHOR_TOP")
-    WorldMapTooltip:AddLine(T["Exploration Point"]..":", .3, 1, .8)
+    WorldMapTooltip:AddLine(T["Exploration Point"]..":", pfUI.cr, pfUI.cg, pfUI.cb)
     WorldMapTooltip:AddLine(this.name, 1, 1, 1)
     WorldMapTooltip:Show()
 

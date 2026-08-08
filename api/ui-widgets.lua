@@ -472,7 +472,7 @@ function pfUI.api.CreateScrollFrame(name, parent)
   f.slider:SetThumbTexture(pfUI.media["img:col"])
   f.slider.thumb = f.slider:GetThumbTexture()
   f.slider.thumb:SetHeight(50)
-  f.slider.thumb:SetTexture(.3,1,.8,.5)
+  f.slider.thumb:SetTexture(pfUI.cr, pfUI.cg, pfUI.cb,.5)
 
   f.slider:SetScript("OnValueChanged", function()
     f:SetVerticalScroll(this:GetValue())
@@ -1188,7 +1188,7 @@ function pfUI.api.CreateInfoBox(text, time, parent, height)
 
     infobox.timeout = CreateFrame("StatusBar", nil, infobox)
     infobox.timeout:SetStatusBarTexture(pfUI.media["img:bar"])
-    infobox.timeout:SetStatusBarColor(.3,1,.8,1)
+    infobox.timeout:SetStatusBarColor(pfUI.cr, pfUI.cg, pfUI.cb,1)
 
     infobox:ClearAllPoints()
     infobox.text:SetAllPoints(infobox)
