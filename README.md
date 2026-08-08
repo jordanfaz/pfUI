@@ -12,6 +12,10 @@
 > Upstream is **https://github.com/brues-code/pfUI** — go there for the real project,
 > issues and releases. Local changes live on the `octo` branch and exist only because they
 > had not been reported upstream yet. GPLv3, same as upstream; see `LICENSE`.
+>
+> 📋 **[CHANGES-octo.md](CHANGES-octo.md) — full changelog of everything added on top of
+> upstream.** Section 1 lists **bugs found in the upstream tree**, which affect every user
+> of that fork and are the part worth pulling back upstream.
 
 # pfUI - ClassicAPI Edition
 

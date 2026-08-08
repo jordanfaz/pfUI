@@ -1,0 +1,86 @@
+# Changes on top of brues-code/pfUI
+
+Everything on the `octo` branch that is not in
+[brues-code/pfUI](https://github.com/brues-code/pfUI) — **42 files, +489 / −194**.
+
+Section 1 is **bugs in the upstream tree**: they affect every user of that fork, not just
+OctoWoW, and are the part worth pulling upstream. Sections 2–4 are local preferences and
+restorations that are only interesting if you want them.
+
+Each fix was verified against the upstream implementation before being written — several
+July fixes from our older fork turned out to be unnecessary here because the upstream
+rewrite already solved them, or solved them *better*, and were dropped rather than ported.
+
+---
+
+## 1. Bugs found in the upstream tree
+
+### Breaks every install, including the release zips
+| | |
+|---|---|
+| `init/skins.xml:44-45` | Included `custom_merchant.lua` and `arena_score.lua`, **neither of which is tracked in git**. Two `Error loading` lines at every login, and both skins absent from every release — the release workflow packages the repo. (`b338b4a1`) |
+
+### Crashes and errors
+| | |
+|---|---|
+| `modules/map.lua` | Ctrl+scroll re-anchored the world map using the frame `GetPoint()` returned. Once anything else is anchored to `WorldMapFrame` that throws `<unnamed> is dependent on this` — and the error **aborts the rest of the handler, so `SetScale` never runs** and zoom silently does nothing. (`bf055d87`) |
+| `modules/cooldown.lua` | `if not parent then this:Hide() end` — no `return`, so it fell straight through to `parent:GetName()` on the nil it had just tested for. (`c5bc9599`) |
+| `modules/roll.lua` | An uncached item indexed `pfUI.roll.cache[nil]` → *table index is nil*. (`0f8406ff`) |
+| `modules/unitxp.lua` | The logout handler stops three indicators to avoid crash 132, but free-frame distance mode polls from **its own scanner frame**, which was never exposed or stopped. (`ed161fe3`) |
+
+### Silently wrong behaviour
+| | |
+|---|---|
+| `modules/chat.lua` | Whisper detection tests for the colour code at position 1, but the timestamp is prepended **first** — so with timestamps enabled *every* whisper failed detection, losing both the recolour and the correct history entry. (`4b69d597`) |
+| `modules/macrotweak.lua:16` | `if ChatFrameEditBox._AddHistoryLine then` — that field is the backup slot **this block creates**, so it is nil until the block runs. The chat-history filter therefore never installed at all. (`4068110d`) |
+| `modules/mapreveal.lua` | `explorecaches` is keyed by the plain area name, but the hover frame carried only a decorated `"map (area)"` string, so every lookup missed and the hover highlight never fired. (`5e6fe969`) |
+| `modules/socialmod.lua` | The friend-**offline** match was assigned unconditionally over the friend-**online** match, so coming online never recorded `lastseen`. (`ad927806`) |
+| `modules/roll.lua` | `strfind(LOOT_ROLL_ALL_PASSED, LOOT_ROLL_PASSED)` has no captures, so `everyone` was always nil and never reached the blacklist — "Everyone has passed on: X" was counted as a real roller. (`0f8406ff`) |
+| `modules/swingtimer.lua` | Off-hand detection accepted inventory type **21** (`INVTYPE_WEAPONMAINHAND`), which can never occupy the off-hand slot. Should be 22. (`9ab7f5f7`) |
+| `modules/buffwatch.lua` | `fcache` is built once per config table and never invalidated, so ctrl/shift-clicking a skill onto the whitelist or blacklist did nothing until reload. (`f65f897c`) |
+| `modules/firstrun.lua` | Three chat-setup steps printed "Chat module is disabled" and then carried on into the nil `pfUI.chat` they had just tested for. (`1af427e3`) |
+| `libs/libpredict.lua` | `UKNOWNBEING` / `UNKOWNBEING` — misspelled, so both resolve to nil and the guards never matched. (`4068110d`) |
+| `modules/superwow.lua` | `SUPERWOW_VERSION == "1.5"` exact string compare silently drops the hook on any later release. (`82a37752`) |
+| `api/api.lua` + `init/modules.xml` | `GetPerfectPixel` measured against the `uiScale` CVar, which caps at 1.0 while the Huge/Large presets push `UIParent` past it — wrong border thickness. Compounded by `pixelperfect` loading 56th, so the first call cached the previous scale. (`dac2d341`, `dd89a210`) |
+| `modules/unitxp.lua`, `modules/raid.lua` | `pfUI.env` has `__index` but no `__newindex`, so a bare global assignment inside a `RegisterModule` closure never reaches `_G`. Cost the `BattlefieldFrame_Show` override and `GROUP_REPLACE_PARTY`. (`617c8320`) |
+| `modules/bags.lua` | Two byte-identical `frame.search` `OnHide` handlers installed back to back; the second overwrote the first. (`e7765044`) |
+
+---
+
+## 2. Performance
+
+| | |
+|---|---|
+| `UnitHasAggro` | Concatenated `<u>target` / `<u>targettarget` per call per unit though `pfValidUnits` never changes after load, and cached only *positive* results — so the common case (nothing has aggro) rescanned the whole unit table on every call. Static triple list + a 0.3s negative cache. (`6645b031`) |
+| `GetStatusValue` | Ran `GetUnitStats` and the whole formatting path for text slots set to `none`, then returned `""`. 40 raid frames × 6 slots per refresh. (`ad5353e4`) |
+| `cooldown` | `GetParent` + `GetName` + a concat + two `_G` lookups **before** the 0.1s throttle could bail — every frame, per cooldown frame. (`c5bc9599`) |
+| `loot` autoresize | The hook sat inside the per-slot creation loop, so **every slot frame** got an `OnUpdate` rebuilding the entire loot frame. N rebuilds per frame. (`5210b122`) |
+| `nampower` reactive | `C_Spell.IsSpellUsable` + `SetShown` per icon, every frame, unthrottled. (`a90740fe`) |
+| `player` | `UpdateConfig` → `EnableScripts` → `SetScript("OnUpdate", …)` discards the throttle wrapper installed at load, so any config change left the frame running unthrottled until reload. (`6b83208b`) |
+
+---
+
+## 3. Options restored from our older fork
+
+- **Class-colour accent** — `pfUI.cr/cg/cb/chex` drive the signature mint, swapped for the
+  player's class colour via a *Use Class Color* toggle. ~100 literals converted across both
+  mint shades, including the `pf` logo, which is drawn pixel by pixel.
+  (`c64b3593`, `9c047555`, `5aedfffe`, `161f48dd`)
+  *Note: literals inside `T[...]` translation keys are deliberately left alone — rewriting
+  the key at runtime makes the lookup miss and breaks localised clients.*
+- **Hide Nameplates Out Of Combat** (`8bbae7d8`)
+- **Per-unit portrait / buff / debuff X-Y offsets** — six keys, anchors were hardcoded to 0 (`9e54fd11`)
+- **Hide Total Timer** for player, target and focus castbars (`f09003f7`)
+- **Hide Gold Amount** in bags (`6e499d10`)
+- Dropped the *Experimental* marker from three options that were audited and fixed (`ee482178`)
+
+## 4. New
+
+- **Target nameplate symbols**, rebuilt as **textures** rather than FontStrings. Nameplate
+  FontStrings stop growing at roughly 32px and ignore `SetScale` because plates are
+  `WorldFrame` children — both measured. A texture takes an explicit width/height and has
+  no ceiling, so the size multiplier finally does something. Art, size, gap and colour are
+  configurable. (`ec8ce272` and follow-ups)
+- **Castbar drawn above the unit frame stack** — it sat at frame level 8 against buff icons
+  at 12, cooldown spirals at 14 and unit texts at 16, so a castbar placed over the aura rows
+  was drawn underneath them. Now 20. (`9551cf3c`)
