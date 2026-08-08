@@ -305,11 +305,12 @@ pfUI:RegisterModule("castbar", function ()
       end
 
       if this.showtimer then
+        local total = this.hidetotaltimer and "" or (" / " .. FormatCastbarTime(max))
         if (this.delay or 0) > 0 then
           local prefix = "|cffffaaaa" .. (this.isChannel and "-" or "+") .. FormatCastbarTime(this.delay) .. " |r "
-          this.bar.right:SetText(prefix .. FormatCastbarTime(cur) .. " / " .. FormatCastbarTime(max))
+          this.bar.right:SetText(prefix .. FormatCastbarTime(cur) .. total)
         else
-          this.bar.right:SetText(FormatCastbarTime(cur) .. " / " .. FormatCastbarTime(max))
+          this.bar.right:SetText(FormatCastbarTime(cur) .. total)
         end
       end
     end)
@@ -442,6 +443,7 @@ pfUI:RegisterModule("castbar", function ()
     pfUI.castbar.player.showicon = C.castbar.player.showicon == "1" and true or nil
     pfUI.castbar.player.showname = C.castbar.player.showname == "1" and true or nil
     pfUI.castbar.player.showtimer = C.castbar.player.showtimer == "1" and true or nil
+    pfUI.castbar.player.hidetotaltimer = C.castbar.player.hidetotaltimer == "1" and true or nil
     pfUI.castbar.player.showlag = C.castbar.player.showlag == "1" and true or nil
     pfUI.castbar.player.showrank = C.castbar.player.showrank == "1" and true or nil
     pfUI.castbar.player.spacing = default_border * 2 + tonumber(C.unitframes.player.pspace) * GetPerfectPixel()
@@ -481,6 +483,7 @@ pfUI:RegisterModule("castbar", function ()
     pfUI.castbar.target.showicon = C.castbar.target.showicon == "1" and true or nil
     pfUI.castbar.target.showname = C.castbar.target.showname == "1" and true or nil
     pfUI.castbar.target.showtimer = C.castbar.target.showtimer == "1" and true or nil
+    pfUI.castbar.target.hidetotaltimer = C.castbar.target.hidetotaltimer == "1" and true or nil
     pfUI.castbar.target.showlag = C.castbar.target.showlag == "1" and true or nil
     pfUI.castbar.target.showrank = C.castbar.target.showrank == "1" and true or nil
     pfUI.castbar.target.spacing = default_border * 2 + tonumber(C.unitframes.target.pspace) * GetPerfectPixel()
@@ -509,6 +512,7 @@ pfUI:RegisterModule("castbar", function ()
     pfUI.castbar.focus.showicon = C.castbar.focus.showicon == "1" and true or nil
     pfUI.castbar.focus.showname = C.castbar.focus.showname == "1" and true or nil
     pfUI.castbar.focus.showtimer = C.castbar.focus.showtimer == "1" and true or nil
+    pfUI.castbar.focus.hidetotaltimer = C.castbar.focus.hidetotaltimer == "1" and true or nil
     pfUI.castbar.focus.showlag = C.castbar.focus.showlag == "1" and true or nil
     pfUI.castbar.focus.showrank = C.castbar.focus.showrank == "1" and true or nil
     pfUI.castbar.focus.spacing = default_border * 2 + tonumber(C.unitframes.focus.pspace) * GetPerfectPixel()
