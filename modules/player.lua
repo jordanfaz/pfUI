@@ -107,22 +107,32 @@ pfUI:RegisterModule("player", function ()
   -- Keep a reference to the generic UF UpdateConfig so we can chain it
   local genericUpdateConfig = pfUI.uf.UpdateConfig
 
-  function playerFrame:UpdateConfig()
-    genericUpdateConfig(self)
-    UpdateInfoText()
-  end
-
-  -- Add throttle to player frame OnUpdate
-  -- Throttle the unit frame's existing OnUpdate to ~20 FPS so the per-frame
-  -- work stays cheap.
-  if pfUI.uf.player:GetScript("OnUpdate") then
-    local originalOnUpdate = pfUI.uf.player:GetScript("OnUpdate")
-    pfUI.uf.player:SetScript("OnUpdate", function()
+  -- Throttle the unit frame's existing OnUpdate to ~20 FPS so the per-frame work
+  -- stays cheap. pfUI.uf:UpdateConfig -> EnableScripts does
+  -- SetScript("OnUpdate", pfUI.uf.OnUpdate), which throws this wrapper away, so
+  -- it has to be re-applied after every config update or the throttle is
+  -- silently lost until reload. The marker upvalue stops us wrapping our own
+  -- wrapper on the re-apply.
+  local pfPlayerOnUpdate
+  local function InstallPlayerOnUpdate()
+    local current = pfUI.uf.player:GetScript("OnUpdate")
+    if not current or current == pfPlayerOnUpdate then return end
+    local originalOnUpdate = current
+    pfPlayerOnUpdate = function()
       if (this.throttleTick or 0) > GetTime() then return end
       this.throttleTick = GetTime() + 0.05
       originalOnUpdate()
-    end)
+    end
+    pfUI.uf.player:SetScript("OnUpdate", pfPlayerOnUpdate)
   end
+
+  function playerFrame:UpdateConfig()
+    genericUpdateConfig(self)
+    UpdateInfoText()
+    InstallPlayerOnUpdate() -- EnableScripts just reset OnUpdate; re-apply the throttle
+  end
+
+  InstallPlayerOnUpdate()
 
   -- Haste / spell-power overlay text — refreshes 4×/sec on its own ticker,
   -- independent of the unit frame's OnUpdate cadence.
