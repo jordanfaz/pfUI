@@ -299,7 +299,7 @@ pfUI:RegisterModule("unlock", function ()
     pfUI.unlock.dock.parent = frame
 
     if frame then
-      pfUI.unlock.dock.parent.backdrop:SetBackdropBorderColor(.2,1,.8,1)
+      pfUI.unlock.dock.parent.backdrop:SetBackdropBorderColor(pfUI.cr, pfUI.cg, pfUI.cb,1)
       pfUI.unlock.dock:Show()
       UpdateDockValues()
     else
@@ -334,7 +334,7 @@ pfUI:RegisterModule("unlock", function ()
     for id, frame in pairs(pfUI.unlock.selection) do
       frame:StartMoving()
       frame:StopMovingOrSizing()
-      frame.drag.backdrop:SetBackdropBorderColor(.2,1,.8,1)
+      frame.drag.backdrop:SetBackdropBorderColor(pfUI.cr, pfUI.cg, pfUI.cb,1)
     end
 
     local anchor, _, _, xpos, ypos = frame:GetPoint()
@@ -501,7 +501,7 @@ pfUI:RegisterModule("unlock", function ()
       frame:Show()
     end
 
-    local txt = T["Unlock Mode allows you to move, scale and reset frames:\n\n|cff33ffcc[Left Click]|r Drag Frame\n|cff33ffcc[Middle Click]|r Reset Frame\n|cff33ffcc[Right Click]|r Option Box\n\nHold |cff33ffcc[Shift]|r to select all frames of the same kind\nHold |cff33ffcc[Ctrl]|r to select all frames of the same group\n\n|cff33ffcc[Scroll]|r to change the scale of a frame\n\n|cff33ffcc[Click]|r on an empty area or press |cff33ffcc[Esc]|r to exit\n"]
+    local txt = T["Unlock Mode allows you to move, scale and reset frames:\n\n|cff" .. pfUI.chex .. "[Left Click]|r Drag Frame\n|cff" .. pfUI.chex .. "[Middle Click]|r Reset Frame\n|cff" .. pfUI.chex .. "[Right Click]|r Option Box\n\nHold |cff" .. pfUI.chex .. "[Shift]|r to select all frames of the same kind\nHold |cff" .. pfUI.chex .. "[Ctrl]|r to select all frames of the same group\n\n|cff" .. pfUI.chex .. "[Scroll]|r to change the scale of a frame\n\n|cff" .. pfUI.chex .. "[Click]|r on an empty area or press |cff" .. pfUI.chex .. "[Esc]|r to exit\n"]
     CreateInfoBox(txt, 15, pfUI.unlock, 180)
     pfUI.gui:Hide()
   end)
@@ -674,7 +674,7 @@ pfUI:RegisterModule("unlock", function ()
 
     QueueFunction(SetDockToFrame, pfUI.unlock.dock.parent)
   end)
-  SkinButton(pfUI.unlock.dock.reset,.2,1,.8)
+  SkinButton(pfUI.unlock.dock.reset,pfUI.cr, pfUI.cg, pfUI.cb)
 
   -- move left
   pfUI.unlock.dock.left = CreateFrame("Button", "pfDragDockPosUp", pfUI.unlock.dock, "UIPanelButtonTemplate")
@@ -693,7 +693,7 @@ pfUI:RegisterModule("unlock", function ()
     SavePosition(frame)
     UpdateDockValues()
   end)
-  SkinButton(pfUI.unlock.dock.left,.2,1,.8)
+  SkinButton(pfUI.unlock.dock.left,pfUI.cr, pfUI.cg, pfUI.cb)
 
   -- move right
   pfUI.unlock.dock.right = CreateFrame("Button", "pfDragDockPosUp", pfUI.unlock.dock, "UIPanelButtonTemplate")
@@ -712,7 +712,7 @@ pfUI:RegisterModule("unlock", function ()
     SavePosition(frame)
     UpdateDockValues()
   end)
-  SkinButton(pfUI.unlock.dock.right,.2,1,.8)
+  SkinButton(pfUI.unlock.dock.right,pfUI.cr, pfUI.cg, pfUI.cb)
 
   -- move up
   pfUI.unlock.dock.up = CreateFrame("Button", "pfDragDockPosUp", pfUI.unlock.dock, "UIPanelButtonTemplate")
@@ -731,7 +731,7 @@ pfUI:RegisterModule("unlock", function ()
     SavePosition(frame)
     UpdateDockValues()
   end)
-  SkinButton(pfUI.unlock.dock.up,.2,1,.8)
+  SkinButton(pfUI.unlock.dock.up,pfUI.cr, pfUI.cg, pfUI.cb)
 
   -- move down
   pfUI.unlock.dock.down = CreateFrame("Button", "pfDragDockPosUp", pfUI.unlock.dock, "UIPanelButtonTemplate")
@@ -750,7 +750,7 @@ pfUI:RegisterModule("unlock", function ()
     SavePosition(frame)
     UpdateDockValues()
   end)
-  SkinButton(pfUI.unlock.dock.down,.2,1,.8)
+  SkinButton(pfUI.unlock.dock.down,pfUI.cr, pfUI.cg, pfUI.cb)
 
   -- open config
   pfUI.unlock.dock.config = CreateFrame("Button", "pfDragDockConfigOpen", pfUI.unlock.dock, "UIPanelButtonTemplate")
@@ -762,5 +762,5 @@ pfUI:RegisterModule("unlock", function ()
     local cat, conf = GetConfigTable(pfUI.unlock.dock.parent.label)
     if cat then OpenConfigDialog(cat, conf) end
   end)
-  SkinButton(pfUI.unlock.dock.config,.2,1,.8)
+  SkinButton(pfUI.unlock.dock.config,pfUI.cr, pfUI.cg, pfUI.cb)
 end)

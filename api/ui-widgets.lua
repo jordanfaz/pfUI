@@ -388,12 +388,12 @@ function pfUI.api.CreateTabChild(self, title, bwidth, bheight, bottom, static)
     end
   end
 
-  SkinButton(b,.2,1,.8)
+  SkinButton(b,pfUI.cr, pfUI.cg, pfUI.cb)
 
   if childcount ~= 1 then
     b:SetTextColor(.5,.5,.5)
   else
-    b:SetTextColor(.2,1,.8)
+    b:SetTextColor(pfUI.cr, pfUI.cg, pfUI.cb)
   end
 
   b:SetScript("OnClick", function()
@@ -406,7 +406,7 @@ function pfUI.api.CreateTabChild(self, title, bwidth, bheight, bottom, static)
       v.active = false
       v:SetTextColor(.5,.5,.5)
     end
-    self.buttons[this:GetID()]:SetTextColor(.2,1,.8)
+    self.buttons[this:GetID()]:SetTextColor(pfUI.cr, pfUI.cg, pfUI.cb)
   end)
 
   self.buttons[childcount] = b
@@ -1062,7 +1062,7 @@ function pfUI.api.CreateQuestionDialog(text, yes, no, editbox, onclose)
   if editbox then
     question.input = CreateFrame("EditBox", "pfQuestionDialogEdit", question)
     pfUI.api.CreateBackdrop(question.input)
-    question.input:SetTextColor(.2,1,.8,1)
+    question.input:SetTextColor(pfUI.cr, pfUI.cg, pfUI.cb,1)
     question.input:SetJustifyH("CENTER")
     question.input:SetAutoFocus(false)
     question.input:SetPoint("TOPLEFT", question.text, "BOTTOMLEFT", border, -padding)

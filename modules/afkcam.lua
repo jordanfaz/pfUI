@@ -94,9 +94,9 @@ pfUI:RegisterModule("afkcam", function ()
   clock:SetScript("OnUpdate", function()
     local fmt
     if C.global.twentyfour == "0" then
-      fmt = "%I|cff33ffcc:|r%M %p"
+      fmt = "%I|cff" .. pfUI.chex .. ":|r%M %p"
     else
-      fmt = "%H|cff33ffcc:|r%M"
+      fmt = "%H|cff" .. pfUI.chex .. ":|r%M"
     end
     local time = C.global.servertime == "1" and date(fmt, GetServerEpoch()) or date(fmt)
     clock.time:SetText(time)

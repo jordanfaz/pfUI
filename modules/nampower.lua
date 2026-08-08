@@ -146,7 +146,7 @@ pfUI:RegisterModule("nampower", function ()
       local arg = (msg and msg ~= "") and msg or "greens"
       local target = tonumber(arg) or arg
       DisenchantAll(target)
-      print("|cff33ffccpfUI|r: DisenchantAll(" .. tostring(target) .. ")")
+      print("|cff" .. pfUI.chex .. "pfUI|r: DisenchantAll(" .. tostring(target) .. ")")
     end, true)
   end
 

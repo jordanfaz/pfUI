@@ -200,7 +200,7 @@ pfUI:RegisterModule("chat", function ()
   end)
 
   pfUI.chat.urlcopy.text = CreateFrame("EditBox", "pfURLCopyEditBox", pfUI.chat.urlcopy)
-  pfUI.chat.urlcopy.text:SetTextColor(.2,1,.8,1)
+  pfUI.chat.urlcopy.text:SetTextColor(pfUI.cr, pfUI.cg, pfUI.cb,1)
   pfUI.chat.urlcopy.text:SetJustifyH("CENTER")
 
   pfUI.chat.urlcopy.text:SetWidth(250)

@@ -138,7 +138,7 @@ pfUI:RegisterModule("roll", function ()
     end)
     f.need:SetScript("OnEnter", function()
       GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
-      GameTooltip:SetText("|cff33ffcc" .. NEED)
+      GameTooltip:SetText("|cff" .. pfUI.chex .. NEED)
       if f.itemname and pfUI.roll.cache[f.itemname] then
         for _, player in pairs(pfUI.roll.cache[f.itemname]["NEED"]) do
           GameTooltip:AddLine(player)
@@ -167,7 +167,7 @@ pfUI:RegisterModule("roll", function ()
     end)
     f.greed:SetScript("OnEnter", function()
       GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
-      GameTooltip:SetText("|cff33ffcc" .. GREED)
+      GameTooltip:SetText("|cff" .. pfUI.chex .. GREED)
       if f.itemname and pfUI.roll.cache[f.itemname] then
         for _, player in pairs(pfUI.roll.cache[f.itemname]["GREED"]) do
           GameTooltip:AddLine(player)
@@ -196,7 +196,7 @@ pfUI:RegisterModule("roll", function ()
     end)
     f.pass:SetScript("OnEnter", function()
       GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
-      GameTooltip:SetText("|cff33ffcc" .. PASS)
+      GameTooltip:SetText("|cff" .. pfUI.chex .. PASS)
       if f.itemname and pfUI.roll.cache[f.itemname] then
         for _, player in pairs(pfUI.roll.cache[f.itemname]["PASS"]) do
           GameTooltip:AddLine(player)

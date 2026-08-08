@@ -4,7 +4,7 @@
 -- DLL Status Check Command (always available)
 pfUI.api.RegisterSlashCommand("PFDLLSTATUS", { "/pfdll" }, function()
   local chat = DEFAULT_CHAT_FRAME
-  chat:AddMessage("|cff33ffccpfUI|r: DLL Status Check")
+  chat:AddMessage("|cff" .. pfUI.chex .. "pfUI|r: DLL Status Check")
 
   -- SuperWoW
   if SUPERWOW_VERSION then
@@ -174,7 +174,7 @@ pfUI:RegisterModule("superwow", function ()
     -- Add slash command for clickthrough toggle
     pfUI.api.RegisterSlashCommand("PFCLICKTHROUGH", { "/clickthrough", "/ct" }, function()
       local enabled = pfUI.api.ToggleClickthrough()
-      DEFAULT_CHAT_FRAME:AddMessage("|cff33ffccpfUI|r: Clickthrough mode " .. (enabled and "|cff00ff00enabled|r" or "|cffff0000disabled|r"))
+      DEFAULT_CHAT_FRAME:AddMessage("|cff" .. pfUI.chex .. "pfUI|r: Clickthrough mode " .. (enabled and "|cff00ff00enabled|r" or "|cffff0000disabled|r"))
     end, true)
   end
 

@@ -42,7 +42,7 @@ pfUI:RegisterModule("addons", function ()
 
   pfUI.addons.caption = pfUI.addons:CreateFontString("Status", "LOW", "GameFontNormal")
   pfUI.addons.caption:SetFont(pfUI.font_default, C.global.font_size + 4, "OUTLINE")
-  pfUI.addons.caption:SetTextColor(.2, 1, .8, 1)
+  pfUI.addons.caption:SetTextColor(pfUI.cr, pfUI.cg, pfUI.cb, 1)
   pfUI.addons.caption:SetPoint("TOP", 0, -10)
   pfUI.addons.caption:SetJustifyH("LEFT")
   pfUI.addons.caption:SetText(T["Addon List"])
@@ -144,7 +144,7 @@ pfUI:RegisterModule("addons", function ()
   pfUI.addons.profile.del:SetScript("OnClick", function() -- TODO
     local id, name = pfUI.addons.profile.dropdown:GetSelection()
     if not name then return end
-    CreateQuestionDialog(T["Delete profile"] .. " '|cff33ffcc" .. name .. "|r'?", function()
+    CreateQuestionDialog(T["Delete profile"] .. " '|cff" .. pfUI.chex .. name .. "|r'?", function()
       pfUI_addon_profiles[name] = nil
       SetAddonProfile(T["Current"])
     end)
@@ -214,7 +214,7 @@ pfUI:RegisterModule("addons", function ()
   local function AddDependencyLines(header, deps)
     if not deps or table.getn(deps) == 0 then return end
     GameTooltip:AddLine(" ")
-    GameTooltip:AddLine(header .. ":", .2, 1, .8)
+    GameTooltip:AddLine(header .. ":", pfUI.cr, pfUI.cg, pfUI.cb)
     for _, dep in ipairs(deps) do
       if IsAddOnLoaded(dep) then
         GameTooltip:AddLine(" " .. dep, .5, 1, .5)
@@ -232,11 +232,11 @@ pfUI:RegisterModule("addons", function ()
     GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
     GameTooltip:SetText(this.atitle)
     if this.aversion then
-      GameTooltip:AddDoubleLine(T["Version"], this.aversion, 1,1,1, .2,1,.8)
+      GameTooltip:AddDoubleLine(T["Version"], this.aversion, 1,1,1, pfUI.cr, pfUI.cg, pfUI.cb)
     end
 
     if this.aauthor then
-      GameTooltip:AddDoubleLine(T["Author"], this.aauthor, 1,1,1, .2,1,.8)
+      GameTooltip:AddDoubleLine(T["Author"], this.aauthor, 1,1,1, pfUI.cr, pfUI.cg, pfUI.cb)
     end
 
     GameTooltip:AddLine(this.anote, .75,.75,.75,1)

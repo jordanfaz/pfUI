@@ -336,7 +336,7 @@ pfUI:RegisterModule("unitxp", function ()
   -- Debug command to test UnitXP indicators
   pfUI.api.RegisterSlashCommand("PFUNITXP", { "/pfunitxp" }, function()
     local chat = DEFAULT_CHAT_FRAME
-    chat:AddMessage("|cff33ffccpfUI|r: UnitXP Indicator Debug")
+    chat:AddMessage("|cff" .. pfUI.chex .. "pfUI|r: UnitXP Indicator Debug")
 
     -- Check if target exists
     if not UnitExists("target") then

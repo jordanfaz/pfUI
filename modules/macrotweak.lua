@@ -6,7 +6,7 @@ pfUI:RegisterModule("macrotweak", function ()
     local name = addon
     EventUtil.ContinueOnAddOnLoaded(name, function()
       if not disabled then
-        DEFAULT_CHAT_FRAME:AddMessage("|cff33ffccpfUI|r: " .. name .. " found, macrotweak disabled.")
+        DEFAULT_CHAT_FRAME:AddMessage("|cff" .. pfUI.chex .. "pfUI|r: " .. name .. " found, macrotweak disabled.")
       end
       disabled = true
     end)

@@ -23,7 +23,7 @@ pfUI:RegisterModule("bgscore", function ()
     pfUI_config.positions["WorldStateAlwaysUpFrame"] = { x = x, y = y }
     bgframe:ClearAllPoints()
     bgframe:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
-    DEFAULT_CHAT_FRAME:AddMessage("|cff33ffccBG Score Frame|r position saved.")
+    DEFAULT_CHAT_FRAME:AddMessage("|cff" .. pfUI.chex .. "BG Score Frame|r position saved.")
   end)
   mover:Hide()
 

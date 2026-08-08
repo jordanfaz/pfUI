@@ -87,7 +87,7 @@ pfUI:RegisterModule("firstrun", function ()
     f.progress:SetPoint("BOTTOMRIGHT", -100, 10)
     f.progress:SetHeight(12)
     f.progress:SetStatusBarTexture(pfUI.media["img:bar"])
-    f.progress:SetStatusBarColor(.2,1,.8,1)
+    f.progress:SetStatusBarColor(pfUI.cr, pfUI.cg, pfUI.cb,1)
     f.progress:SetMinMaxValues(1,9)
     f.progress:SetValue(3)
     CreateBackdrop(f.progress)
@@ -127,14 +127,14 @@ pfUI:RegisterModule("firstrun", function ()
   -- welcome dialog
   pfUI.firstrun:AddStep("init", function()
     local f = CreateFirstRunPage()
-    f.text:SetText(string.format(T["Welcome to |cff33ffccpf|cffffffffUI|r!\n\nI'm the first run wizard that will guide you through some basic configuration. If you're lazy, feel free to hit the \"Defaults\" button. If you wish to run this dialog again, go to the settings and hit the \"Reset Firstrun\" button.\n\nVisit |cff33ffcc%s|r to check for the latest version."], GetAddOnMetadata(pfUI.name, "X-Website")))
+    f.text:SetText(string.format(T["Welcome to |cff" .. pfUI.chex .. "pf|cffffffffUI|r!\n\nI'm the first run wizard that will guide you through some basic configuration. If you're lazy, feel free to hit the \"Defaults\" button. If you wish to run this dialog again, go to the settings and hit the \"Reset Firstrun\" button.\n\nVisit |cff" .. pfUI.chex .. "%s|r to check for the latest version."], GetAddOnMetadata(pfUI.name, "X-Website")))
     return f
   end)
 
   -- choose profile
   pfUI.firstrun:AddStep("profile", function()
     local f = CreateFirstRunPage()
-    f.text:SetText(T["A new installation of |cff33ffccpf|rUI ships with 4 prebuilt design profiles. Click below if you wish to load one of these profiles."])
+    f.text:SetText(T["A new installation of |cff" .. pfUI.chex .. "pf|rUI ships with 4 prebuilt design profiles. Click below if you wish to load one of these profiles."])
 
     f.Modern = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
     f.Modern:SetWidth(120)
@@ -230,7 +230,7 @@ pfUI:RegisterModule("firstrun", function ()
   -- optimized cvars dialog
   pfUI.firstrun:AddStep("cvars", function()
     local f = CreateFirstRunPage()
-    f.text:SetText(T["|cff33ffccBlizzard: \"Interface Options\"|r\n\nDo you want me to set up the recommended Blizzard UI settings? This will enable settings that can be found in the Interface section of your client. Options like Buff Durations, Instant Quest Text, Auto Selfcast and others will be set."])
+    f.text:SetText(T["|cff" .. pfUI.chex .. "Blizzard: \"Interface Options\"|r\n\nDo you want me to set up the recommended Blizzard UI settings? This will enable settings that can be found in the Interface section of your client. Options like Buff Durations, Instant Quest Text, Auto Selfcast and others will be set."])
 
     f.checkbox = CreateFrame("CheckButton", "pfCheckBoxCVAR", f, "UICheckButtonTemplate")
     f.checkbox:SetChecked(true)
@@ -252,7 +252,7 @@ pfUI:RegisterModule("firstrun", function ()
   -- right chat dialog
   pfUI.firstrun:AddStep("chat_right", function()
     local f = CreateFirstRunPage()
-    f.text:SetText(T["|cff33ffccChat: \"Loot & Spam\"|r\n\nDo you want me to create and manage a specific Chatframe called \"Loot & Spam\"? This chat will display world channels, loot information and miscellaneous messages, that would otherwise clutter your main chatframe."])
+    f.text:SetText(T["|cff" .. pfUI.chex .. "Chat: \"Loot & Spam\"|r\n\nDo you want me to create and manage a specific Chatframe called \"Loot & Spam\"? This chat will display world channels, loot information and miscellaneous messages, that would otherwise clutter your main chatframe."])
 
     f.checkbox = CreateFrame("CheckButton", "pfCheckBoxChatRight", f, "UICheckButtonTemplate")
     f.checkbox:SetChecked(true)
@@ -273,7 +273,7 @@ pfUI:RegisterModule("firstrun", function ()
   -- chat position dialog
   pfUI.firstrun:AddStep("chat_position", function()
     local f = CreateFirstRunPage()
-    f.text:SetText(T["|cff33ffccChat: \"Layout\"|r\n\nDo you want me to adjust the layout of your chatframes? This would make sure, that every window is placed on its dedicated position."])
+    f.text:SetText(T["|cff" .. pfUI.chex .. "Chat: \"Layout\"|r\n\nDo you want me to adjust the layout of your chatframes? This would make sure, that every window is placed on its dedicated position."])
     f.checkbox = CreateFrame("CheckButton", "pfCheckBoxChatPosition", f, "UICheckButtonTemplate")
     f.checkbox:SetChecked(true)
     f.checkbox.text = f:CreateFontString("Status", "LOW", "GameFontNormal")
@@ -295,7 +295,7 @@ pfUI:RegisterModule("firstrun", function ()
   -- chat channels dialog
   pfUI.firstrun:AddStep("chat_channels", function()
     local f = CreateFirstRunPage()
-    f.text:SetText(T["|cff33ffccChat: \"Channels\"|r\n\nDo you want me to setup the chat channels of your chatframes? This would set important or personal messages to the left chat and world channels and lootinformation to the right chat."])
+    f.text:SetText(T["|cff" .. pfUI.chex .. "Chat: \"Channels\"|r\n\nDo you want me to setup the chat channels of your chatframes? This would set important or personal messages to the left chat and world channels and lootinformation to the right chat."])
     f.checkbox = CreateFrame("CheckButton", "pfCheckBoxChatChannels", f, "UICheckButtonTemplate")
     f.checkbox:SetChecked(true)
     f.checkbox.text = f:CreateFontString("Status", "LOW", "GameFontNormal")
@@ -337,7 +337,7 @@ pfUI:RegisterModule("firstrun", function ()
     end
 
     local f = CreateFirstRunPage()
-    f.text:SetText(T["Your interface is now set up.\n\nFor advanced configuration, just open the |cff33ffccpf|rUI settings via the escape menu or type \"|cffffffaa/pfui|r\" into the chat.\n\n Have a nice trip!\n\n|cffaaaaaa- Shagu"])
+    f.text:SetText(T["Your interface is now set up.\n\nFor advanced configuration, just open the |cff" .. pfUI.chex .. "pf|rUI settings via the escape menu or type \"|cffffffaa/pfui|r\" into the chat.\n\n Have a nice trip!\n\n|cffaaaaaa- Shagu"])
     return f
   end)
 end)

@@ -576,7 +576,7 @@ pfUI:RegisterModule("bags", function ()
         frame.bagslots.slots[slot].frame:SetScript("OnEnter", function()
           for slot, f in ipairs(pfUI.bags[this.slot + 1].slots) do
             CreateBackdrop(f.frame, default_border)
-            f.frame.backdrop:SetBackdropBorderColor(.2,1,.8,1)
+            f.frame.backdrop:SetBackdropBorderColor(pfUI.cr, pfUI.cg, pfUI.cb,1)
           end
           SlotEnter(this)
         end)
