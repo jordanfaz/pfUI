@@ -9,18 +9,20 @@ pfUI:RegisterModule("cooldown", function ()
   local parent, parent_name
   local function pfCooldownOnUpdate()
     parent = this:GetParent()
-    if not parent then this:Hide() end
-    parent_name = parent:GetName()
-
-    -- avoid to set cooldowns on invalid frames
-    if parent_name and _G[parent_name .. "Cooldown"] then
-      if not _G[parent_name .. "Cooldown"]:IsShown() then
-        this:Hide()
-      end
-    end
+    if not parent then this:Hide() return end
 
     -- only run every 0.1 seconds from here on
     if ( this.tick or .1) > GetTime() then return else this.tick = GetTime() + .1 end
+
+    -- resolve and cache the matching blizzard cooldown frame once (avoids a
+    -- per-frame string concat + _G lookup), then hide our text on invalid frames
+    if this.pfParentCooldown == nil then
+      parent_name = parent:GetName()
+      this.pfParentCooldown = (parent_name and _G[parent_name .. "Cooldown"]) or false
+    end
+    if this.pfParentCooldown and not this.pfParentCooldown:IsShown() then
+      this:Hide()
+    end
 
     -- fix own alpha value (should be inherited, but somehow isn't always)
     if this:GetAlpha() ~= parent:GetAlpha() then
