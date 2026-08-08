@@ -180,7 +180,11 @@ pfUI:RegisterModule("castbar", function ()
 
     cb:SetHeight(C.global.font_size * 1.5)
     cb:SetFrameStrata("MEDIUM")
-    cb:SetFrameLevel(8)
+    -- Above the whole unit-frame stack: buff/debuff icons sit at 12, their
+    -- cooldown spirals at 14, ress icon and unit texts at 16. At the old level 8
+    -- a castbar parked over the aura rows was drawn underneath them. 20 clears
+    -- all of it and still stays below the indicator cooldown overlay at 48.
+    cb:SetFrameLevel(20)
 
     cb.unitstr = unitstr
     cb.unitname = unitname
