@@ -108,6 +108,12 @@ pfUI.skins = {}
 pfUI.environment = {}
 pfUI.movables = {}
 pfUI.version = {}
+
+-- pfUI signature accent color (mint green). Overridden by the player's class
+-- color when "Use Class Color" is enabled. Computed once after config load.
+-- pfUI.chex is the same color as an "rrggbb" hex string for |cff text codes.
+pfUI.cr, pfUI.cg, pfUI.cb = 0.2, 1, 0.8
+pfUI.chex = "33ffcc"
 pfUI.env = {}
 
 if not pfUI.disabled then
@@ -439,6 +445,23 @@ pfUI:SetScript("OnEvent", function()
 
     pfUI:LoadConfig()
     pfUI:MigrateConfig()
+
+    -- Resolve the pfUI accent color: class color when enabled, else mint green.
+    -- Guard the class token: PFUI_CLASS_COLORS has an __index, so indexing it
+    -- with nil would hand back a string instead of a colour table.
+    pfUI.cr, pfUI.cg, pfUI.cb = 0.2, 1, 0.8
+    pfUI.chex = "33ffcc"
+    if pfUI_config.appearance and pfUI_config.appearance.border
+        and pfUI_config.appearance.border.classcolor == "1" then
+      local uclass = UnitClassBase and UnitClassBase("player")
+      local ucol = uclass and PFUI_CLASS_COLORS[uclass]
+      if ucol and ucol.r then
+        pfUI.cr, pfUI.cg, pfUI.cb = ucol.r, ucol.g, ucol.b
+        pfUI.chex = string.format("%02x%02x%02x",
+          math.floor(ucol.r*255+0.5), math.floor(ucol.g*255+0.5), math.floor(ucol.b*255+0.5))
+      end
+    end
+
     pfUI:UpdateFonts()
 
     -- load modules

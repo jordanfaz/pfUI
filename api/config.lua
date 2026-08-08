@@ -124,6 +124,7 @@ function pfUI:LoadConfig()
   pfUI:UpdateConfig("buffbar",    "tdebuff",     "whitelist",        "")
   pfUI:UpdateConfig("buffbar",    "tdebuff",     "blacklist",        "")
 
+  pfUI:UpdateConfig("appearance", "border",      "classcolor",       "0")
   pfUI:UpdateConfig("appearance", "border",      "background",       "0,0,0,1")
   pfUI:UpdateConfig("appearance", "border",      "color",            "0.2,0.2,0.2,1")
   pfUI:UpdateConfig("appearance", "border",      "shadow",           "0")
