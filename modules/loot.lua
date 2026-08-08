@@ -640,6 +640,9 @@ pfUI:RegisterModule("loot", function ()
     end
 
     if event == "LOOT_OPENED" then
+      -- arg1 of LOOT_OPENED is the autoloot flag; it decides whether closing
+      -- the loot has to be reported back to the server
+      local autoLoot = arg1
       ShowUIPanel(this)
 
       if(not this:IsShown()) then
