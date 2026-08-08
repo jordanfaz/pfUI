@@ -1,3 +1,18 @@
+> ### Attribution
+>
+> **This is a private downstream fork. Almost none of the work here is mine.**
+>
+> | | |
+> |---|---|
+> | **[Shagu](https://github.com/shagu/pfUI)** | created pfUI. Everything below rests on it. |
+> | **[brues-code / Railgun](https://github.com/brues-code/pfUI)** | wrote the ClassicAPI Edition this fork tracks — the `C_NamePlate` / `C_UnitAuras` / `C_Spell` conversion, event-driven nameplates, real castbars, focus, equipment manager. **Also the author of [ClassicAPI](https://github.com/brues-code/ClassicAPI) itself**, the DLL that makes all of it possible. |
+> | **me0wg4ming** | earlier fork lineage. |
+> | **Roby_Brok** | this repo: a handful of local patches for OctoWoW on top of Railgun's tree. |
+>
+> Upstream is **https://github.com/brues-code/pfUI** — go there for the real project,
+> issues and releases. Local changes live on the `octo` branch and exist only because they
+> had not been reported upstream yet. GPLv3, same as upstream; see `LICENSE`.
+
 # pfUI - ClassicAPI Edition
 
 [![Octo WoW](https://img.shields.io/badge/Octo%20WoW-1.18.1-brightgreen.svg)](https://octowow.st/)

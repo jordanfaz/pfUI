@@ -1,6 +1,6 @@
 ## Interface: 11200
 ## Title: |cff33ffccpf|cffffffffUI
-## Author: Shagu - modified by me0wg4ming & brues
+## Author: Shagu - modified by me0wg4ming & brues - local patches by Roby_Brok
 ## Notes: A complete user interface replacement.
 ## Notes-ruRU: Полная замена пользовательского интерфейса.
 ## Version: @project-version@
