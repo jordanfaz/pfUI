@@ -1243,13 +1243,10 @@ pfUI:RegisterModule("gui", function ()
         "triangle:" .. T["Triangle"],
       },
       ["np_targetsymbolsize"] = {
+        "1:100%",
         "2:200%",
         "3:300%",
         "4:400%",
-        "6:600%",
-        "8:800%",
-        "12:1200%",
-        "16:1600%",
       },
       ["gryphons"] = {
         "None:"..T["None"],
