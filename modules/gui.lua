@@ -2428,6 +2428,8 @@ pfUI:RegisterModule("gui", function ()
       CreateConfig(nil, T["New Item Color"], C.appearance.bags, "newitem_color", "color")
       CreateConfig(nil, T["Enable Movable Bags"], C.appearance.bags, "movable", "checkbox")
       CreateConfig(nil, T["Anchor Bags Above Chat"], C.appearance.bags, "abovechat", "checkbox")
+      CreateConfig(function() if pfUI.bag then pfUI.bag:UpdateGoldVisibility() end end,
+        T["Hide Gold Amount"], C.appearance.bags, "hidegold", "checkbox")
       CreateConfig(nil, T["Hide Chat When Bags Are Opened"], C.appearance.bags, "hidechat", "checkbox")
       CreateConfig(nil, T["Bagslots Per Row"], C.appearance.bags, "bagrowlength")
       CreateConfig(nil, T["Bankslots Per Row"], C.appearance.bags, "bankrowlength")
