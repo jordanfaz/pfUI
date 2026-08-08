@@ -1244,6 +1244,7 @@ pfUI:RegisterModule("gui", function ()
       },
       ["np_targetsymbolsize"] = {
         "1:100%",
+        "1.5:150%",
         "2:200%",
         "3:300%",
         "4:400%",

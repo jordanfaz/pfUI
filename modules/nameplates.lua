@@ -28,12 +28,13 @@ pfUI:RegisterModule("nameplates", function ()
   -- explicit width/height and has no such ceiling.
   -- Both textures point right; the right-hand one is mirrored so the pair
   -- points inward at the plate.
-  -- "triangle" is pfUI's own GUI arrow: pure white, so SetVertexColor can tint
-  -- it to any colour. The client textures have their own base hue and can only
-  -- be darkened or shifted from it.
+  -- "triangle" is pure white so SetVertexColor can tint it to any colour; the
+  -- client textures carry their own base hue and can only be darkened from it.
+  -- It is a 64x64 copy of pfUI's own 16x16 img/right.tga, at the same
+  -- proportions, so it stays sharp when scaled up to a nameplate.
   local targetsymbols = {
     ["arrow"]    = "Interface\\Glues\\Common\\Glue-RightArrow-Button-Up",
-    ["triangle"] = "img:right",
+    ["triangle"] = "img:target_triangle",
   }
   local ceil = ceil
   local abs = abs
