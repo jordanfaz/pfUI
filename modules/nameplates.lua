@@ -28,9 +28,12 @@ pfUI:RegisterModule("nameplates", function ()
   -- explicit width/height and has no such ceiling.
   -- Both textures point right; the right-hand one is mirrored so the pair
   -- points inward at the plate.
+  -- "triangle" is pfUI's own GUI arrow: pure white, so SetVertexColor can tint
+  -- it to any colour. The client textures have their own base hue and can only
+  -- be darkened or shifted from it.
   local targetsymbols = {
     ["arrow"]    = "Interface\\Glues\\Common\\Glue-RightArrow-Button-Up",
-    ["triangle"] = "Interface\\ChatFrame\\ChatFrameExpandArrow",
+    ["triangle"] = "img:right",
   }
   local ceil = ceil
   local abs = abs
@@ -154,8 +157,12 @@ pfUI:RegisterModule("nameplates", function ()
     cfg.owndebuffs = C.nameplates["owndebuffs"] == "1"
     cfg.targetzoom = C.nameplates.targetzoom == "1"
     cfg.zoomval = (tonumber(C.nameplates.targetzoomval) or 0.4) + 1
-    -- target plate symbols: nil when disabled
+    -- target plate symbols: nil when disabled. Resolve through pfUI.media so
+    -- the "img:" path finds the addon wherever its folder is named; client
+    -- paths pass through untouched. Guard the index: pfUI.media[nil] returns
+    -- the string "nil", which is truthy.
     cfg.targetsymbol = targetsymbols[C.nameplates.targetsymbols or "off"]
+    if cfg.targetsymbol then cfg.targetsymbol = pfUI.media[cfg.targetsymbol] end
     cfg.width = tonumber(C.nameplates.width) or 120
     cfg.heighthealth = tonumber(C.nameplates.heighthealth) or 8
     cfg.targetglow = C.nameplates.targetglow == "1"
