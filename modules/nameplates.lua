@@ -505,6 +505,8 @@ nameplates:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 nameplates:RegisterEvent("UNIT_SPELLCAST_STOP")
 nameplates:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
 nameplates:RegisterEvent("PLAYER_GUILD_UPDATE")
+nameplates:RegisterEvent("PLAYER_REGEN_DISABLED")
+nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
   
   nameplates:SetScript("OnEvent", function()
     -- Stop event handling during logout to prevent crash 132
@@ -520,10 +522,14 @@ nameplates:RegisterEvent("PLAYER_GUILD_UPDATE")
     elseif event == "PLAYER_GUILD_UPDATE" and arg1 == 'player' then
       myGuild = GetGuildInfo("player")
 
+    elseif event == "PLAYER_REGEN_DISABLED" or event == "PLAYER_REGEN_ENABLED" then
+      nameplates.ApplyCombatVisibility()
+
     elseif event == "PLAYER_ENTERING_WORLD" or event == "ZONE_CHANGED_NEW_AREA" then
       if event == "PLAYER_ENTERING_WORLD" then
         CacheConfig()
         this:SetGameVariables()
+        nameplates.ApplyCombatVisibility()
         RebuildRaidGuidCache()
         frameState.targetGuid = UnitGUID("target")
         myGuild = GetGuildInfo("player")
@@ -1756,15 +1762,42 @@ nameplates:RegisterEvent("PLAYER_GUILD_UPDATE")
     end
   end
 
+  -- Hide nameplates while out of combat, reveal them when combat starts.
+  -- Returns true when the feature is enabled (and thus owns visibility).
+  nameplates.ApplyCombatVisibility = function()
+    if C.nameplates["hide_out_of_combat"] ~= "1" then return false end
+    if UnitAffectingCombat("player") then
+      -- in combat: restore the configured hostile/friendly visibility
+      nameplates:SetGameVariables()
+    else
+      -- out of combat: hide all nameplates
+      _G.NAMEPLATES_ON = nil
+      HideNameplates()
+      _G.FRIENDNAMEPLATES_ON = nil
+      HideFriendNameplates()
+    end
+    return true
+  end
+
   nameplates:SetGameVariables()
+  nameplates.ApplyCombatVisibility()
 
   nameplates.UpdateConfig = function()
     -- Refresh config cache for all cfg.* values
     CacheConfig()
     RebuildOfftanks()
-    
+
     -- update debuff filters
     DebuffFilterPopulate()
+
+    -- If hide-out-of-combat is enabled, it owns nameplate visibility, so skip
+    -- the friendly-zone logic below -- but still push the config to the plates.
+    if nameplates.ApplyCombatVisibility() then
+      for plate in pairs(registry) do
+        nameplates.OnConfigChange(plate)
+      end
+      return
+    end
 
     -- Check friendly zone state when config changes
     local disableHostile = C.nameplates["disable_hostile_in_friendly"] == "1"

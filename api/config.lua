@@ -849,6 +849,7 @@ function pfUI:LoadConfig()
 
   pfUI:UpdateConfig("nameplates", nil,           "showhostile",                "1")
   pfUI:UpdateConfig("nameplates", nil,           "showfriendly",               "0")
+  pfUI:UpdateConfig("nameplates", nil,           "hide_out_of_combat",         "0")
   pfUI:UpdateConfig("nameplates", nil,           "disable_hostile_in_friendly", "0")
   pfUI:UpdateConfig("nameplates", nil,           "disable_friendly_in_friendly", "0")
   pfUI:UpdateConfig("nameplates", nil,           "use_unitfonts",              "0")
