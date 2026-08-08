@@ -148,6 +148,14 @@ pfUI.libdebuff_all_slots = pfUI.libdebuff_all_slots or {}
 pfUI.libdebuff_recent_casts = pfUI.libdebuff_recent_casts or {}
 local recentCasts = pfUI.libdebuff_recent_casts
 
+-- In-flight casts, keyed by caster GUID: [casterGuid] = { spellID, spellName, icon,
+-- startTime, duration, endTime, event }. This fork's nameplates read cast state from
+-- C_Spell.UnitCastingInfo and do not need the table, but it is a published API that
+-- SuperCleveRoidMacros consumes -- Utility.lua does
+-- `CleveRoids.castTracking = pfUI.libdebuff_casts` -- and its absence silently drops
+-- CleveRoids to a weaker code path for cast conditionals in macros.
+pfUI.libdebuff_casts = pfUI.libdebuff_casts or {}
+
 -- Callbacks fired after SPELL_GO_SELF is processed: fn(spellId, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 pfUI.libdebuff_spell_go_hooks = pfUI.libdebuff_spell_go_hooks or {}
 
@@ -959,6 +967,19 @@ if hasNampower then
       local castTime = (arg6 and arg6 > 0) and arg6 or arg7
       if not casterGuid or not spellId then return end
 
+      -- publish the in-flight cast for consumers of pfUI.libdebuff_casts
+      local now = GetTime()
+      local secs = castTime and castTime > 0 and castTime / 1000 or 0
+      pfUI.libdebuff_casts[casterGuid] = {
+        spellID   = spellId,
+        spellName = C_Spell.GetSpellName(spellId),
+        icon      = C_Spell.GetSpellTexture(spellId),
+        startTime = now,
+        duration  = secs,
+        endTime   = secs > 0 and (now + secs) or nil,
+        event     = arg8 and "CHANNEL" or "START",
+      }
+
       if event == "SPELL_START_SELF" and pfUI.libdebuff_spell_start_self_hooks then
         for _, fn in pairs(pfUI.libdebuff_spell_start_self_hooks) do
           fn(spellId, casterGuid, arg4, castTime)
@@ -975,6 +996,13 @@ if hasNampower then
       local casterGuid = arg3
       local targetGuid = arg4
       local numHit = arg6 or 0
+
+      -- cast finished: drop it from libdebuff_casts. Channels keep ticking after
+      -- SPELL_GO, so leave those to SPELL_FAILED or the next SPELL_START.
+      local inflight = casterGuid and pfUI.libdebuff_casts[casterGuid]
+      if inflight and inflight.spellID == spellId and inflight.event ~= "CHANNEL" then
+        pfUI.libdebuff_casts[casterGuid] = nil
+      end
       local numMissed = arg7 or 0
 
       -- Fire registered SPELL_GO_SELF hooks BEFORE miss guard
@@ -1100,6 +1128,8 @@ if hasNampower then
 
     elseif event == "SPELL_FAILED_OTHER" then
       local casterGuid = arg1
+      -- cast interrupted or failed: clear it so conditionals stop seeing it
+      if casterGuid then pfUI.libdebuff_casts[casterGuid] = nil end
       if pfUI.libdebuff_spell_failed_other_hooks then
         for _, fn in pairs(pfUI.libdebuff_spell_failed_other_hooks) do
           fn(casterGuid, arg2)
