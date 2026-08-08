@@ -2508,6 +2508,10 @@ function pfUI.uf:GetStatusValue(unit, pos)
     config = "unit"
   end
 
+  -- empty text slots return "" anyway; bail before the (expensive) stats pipeline
+  -- so unused positions don't run GetUnitStats every refresh (40 raid frames x 6 slots)
+  if not config or config == "none" then return "" end
+
   -- Get stats with Nampower Integration
   local hp, hpmax, mp, mpmax, powerType = pfUI.api.GetUnitStats(unitstr)
   local rhp, rhpmax = hp, hpmax
