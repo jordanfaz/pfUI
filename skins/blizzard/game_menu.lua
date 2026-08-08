@@ -14,7 +14,9 @@ pfUI:RegisterSkin("Game Menu", function ()
 
   local pfUIButton = CreateFrame("Button", "GameMenuButtonPFUI", GameMenuFrame, "GameMenuButtonTemplate")
   pfUIButton:SetPoint("TOP", 0, -10)
-  pfUIButton:SetText(T["|cff" .. pfUI.chex .. "pf|cffffffffUI|cffcccccc Config"])
+  -- look the string up with its original key so localised builds still match,
+  -- then recolour the accent in the result
+  pfUIButton:SetText((string.gsub(T["|cff33ffccpf|cffffffffUI|cffcccccc Config"], "33ffcc", pfUI.chex or "33ffcc")))
   pfUIButton:SetScript("OnClick", function()
     pfUI.gui:Show()
     HideUIPanel(GameMenuFrame)
