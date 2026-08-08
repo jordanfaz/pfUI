@@ -499,7 +499,7 @@ function pfUI.uf:UpdateConfig()
   elseif f.config.portrait == "left" then
     f.portrait:SetParent(f)
     f.portrait:ClearAllPoints()
-    f.portrait:SetPoint("LEFT", f, "LEFT", 0, 0)
+    f.portrait:SetPoint("LEFT", f, "LEFT", (tonumber(f.config.portraitoffx) or 0), (tonumber(f.config.portraitoffy) or 0))
 
     f.hp:ClearAllPoints()
     f.hp:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
@@ -517,7 +517,7 @@ function pfUI.uf:UpdateConfig()
   elseif f.config.portrait == "right" then
     f.portrait:SetParent(f)
     f.portrait:ClearAllPoints()
-    f.portrait:SetPoint("RIGHT", f, "RIGHT", 0, 0)
+    f.portrait:SetPoint("RIGHT", f, "RIGHT", (tonumber(f.config.portraitoffx) or 0), (tonumber(f.config.portraitoffy) or 0))
 
     f.hp:ClearAllPoints()
     f.hp:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
@@ -726,8 +726,8 @@ function pfUI.uf:UpdateConfig()
       end
       local multiply = C.appearance.border.force_blizz == "1" and 1 or 2
       f.buffs[i]:SetPoint(af, anchor, f.config.buffs,
-      invert_v * (i-1-row*perrow)*(multiply*default_border + f.config.buffsize + 1),
-      invert_h * (row*(multiply*default_border + f.config.buffsize + 1) + (multiply*default_border + 1)))
+      invert_v * (i-1-row*perrow)*(multiply*default_border + f.config.buffsize + 1) + (tonumber(f.config.buffoffx) or 0),
+      invert_h * (row*(multiply*default_border + f.config.buffsize + 1) + (multiply*default_border + 1)) + (tonumber(f.config.buffoffy) or 0))
 
       f.buffs[i]:SetSize(f.config.buffsize, f.config.buffsize)
       
@@ -1708,8 +1708,8 @@ function pfUI.uf:RefreshUnit(unit, component)
         end
         local multiply = C.appearance.border.force_blizz == "1" and 1 or 2
         unit.debuffs[i]:SetPoint(af, anchor, unit.config.debuffs,
-        invert_v * (i-1-row*perrow)*(multiply*default_border + unit.config.debuffsize + 1),
-        invert_h * ((row+buffrow)*(multiply*default_border + unit.config.debuffsize + 1) + (multiply*default_border + 1)))
+        invert_v * (i-1-row*perrow)*(multiply*default_border + unit.config.debuffsize + 1) + (tonumber(unit.config.debuffoffx) or 0),
+        invert_h * ((row+buffrow)*(multiply*default_border + unit.config.debuffsize + 1) + (multiply*default_border + 1)) + (tonumber(unit.config.debuffoffy) or 0))
       end
 
       -- selfdebuff narrows to player-cast harmful auras via the PLAYER filter.
