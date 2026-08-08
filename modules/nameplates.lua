@@ -973,6 +973,12 @@ nameplates:RegisterEvent("PLAYER_GUILD_UPDATE")
     local symbolgap = tonumber(C.nameplates.targetsymbolgap) or 4
     nameplate.symbolleft:SetPoint("RIGHT", nameplate.level, "LEFT", -symbolgap, 0)
     nameplate.symbolright:SetPoint("LEFT", nameplate.health, "RIGHT", symbolgap, 0)
+
+    -- SetVertexColor multiplies, so this tints rather than replaces: it reads
+    -- true on the pale triangle, but only shifts the already-gold arrow button.
+    local sr, sg, sb, sa = GetStringColor(C.nameplates.targetsymbolcolor)
+    nameplate.symbolleft:SetVertexColor(sr, sg, sb, sa)
+    nameplate.symbolright:SetVertexColor(sr, sg, sb, sa)
     nameplate.raidicon:SetSize(C.nameplates.raidiconsize, C.nameplates.raidiconsize)
 
     for i=1,16 do
