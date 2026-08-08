@@ -20,6 +20,18 @@ pfUI:RegisterModule("nameplates", function ()
   local strfind = strfind
   local strlen = strlen
   local floor = floor
+
+  -- Target plate symbols are Textures, not FontStrings. Nameplate FontStrings
+  -- stop growing at roughly 32px and ignore SetScale on a wrapper frame (they
+  -- are WorldFrame children, not UIParent children), so no font setting can
+  -- make them bigger -- measured, both levers were tried. A texture takes an
+  -- explicit width/height and has no such ceiling.
+  -- Both textures point right; the right-hand one is mirrored so the pair
+  -- points inward at the plate.
+  local targetsymbols = {
+    ["arrow"]    = "Interface\\Glues\\Common\\Glue-RightArrow-Button-Up",
+    ["triangle"] = "Interface\\ChatFrame\\ChatFrameExpandArrow",
+  }
   local ceil = ceil
   local abs = abs
   local mathmod = math.mod
@@ -142,6 +154,8 @@ pfUI:RegisterModule("nameplates", function ()
     cfg.owndebuffs = C.nameplates["owndebuffs"] == "1"
     cfg.targetzoom = C.nameplates.targetzoom == "1"
     cfg.zoomval = (tonumber(C.nameplates.targetzoomval) or 0.4) + 1
+    -- target plate symbols: nil when disabled
+    cfg.targetsymbol = targetsymbols[C.nameplates.targetsymbols or "off"]
     cfg.width = tonumber(C.nameplates.width) or 120
     cfg.heighthealth = tonumber(C.nameplates.heighthealth) or 8
     cfg.targetglow = C.nameplates.targetglow == "1"
@@ -782,6 +796,15 @@ nameplates:RegisterEvent("PLAYER_GUILD_UPDATE")
     nameplate.level = nameplate:CreateFontString(nil, "OVERLAY")
     nameplate.level:SetPoint("RIGHT", nameplate.health, "LEFT", -3, 0)
 
+    nameplate.symbolleft = nameplate:CreateTexture(nil, "OVERLAY")
+    nameplate.symbolleft:SetPoint("RIGHT", nameplate.level, "LEFT", -4, 0)
+    nameplate.symbolleft:Hide()
+
+    nameplate.symbolright = nameplate:CreateTexture(nil, "OVERLAY")
+    nameplate.symbolright:SetPoint("LEFT", nameplate.health, "RIGHT", 4, 0)
+    nameplate.symbolright:SetTexCoord(1, 0, 0, 1) -- mirror so it points inward
+    nameplate.symbolright:Hide()
+
     -- Create a dedicated high-level frame for the raid icon so it renders
     -- ABOVE nameplate.health (FrameLevel 4) and stays visible even when
     -- nameplates are toggled off (the Blizzard parent plate still exists).
@@ -936,6 +959,13 @@ nameplates:RegisterEvent("PLAYER_GUILD_UPDATE")
     nameplate.raidicon:ClearAllPoints()
     nameplate.raidicon:SetPoint("BOTTOM", nameplate.health, "TOP", C.nameplates.raidiconoffx, C.nameplates.raidiconoffy)
     nameplate.level:SetFont(font, font_size, font_style)
+
+    -- no cap here, unlike the FontStrings above
+    local symbolsize = floor(font_size * (tonumber(C.nameplates.targetsymbolsize) or 4))
+    nameplate.symbolleft:SetWidth(symbolsize)
+    nameplate.symbolleft:SetHeight(symbolsize)
+    nameplate.symbolright:SetWidth(symbolsize)
+    nameplate.symbolright:SetHeight(symbolsize)
     nameplate.raidicon:SetSize(C.nameplates.raidiconsize, C.nameplates.raidiconsize)
 
     for i=1,16 do
@@ -1439,6 +1469,16 @@ nameplates:RegisterEvent("PLAYER_GUILD_UPDATE")
     -- Cache strata changes
     if nameplate.istarget ~= target then
       nameplate.target_strata = nil
+
+      if target and cfg.targetsymbol then
+        nameplate.symbolleft:SetTexture(cfg.targetsymbol)
+        nameplate.symbolright:SetTexture(cfg.targetsymbol)
+        nameplate.symbolleft:Show()
+        nameplate.symbolright:Show()
+      else
+        nameplate.symbolleft:Hide()
+        nameplate.symbolright:Hide()
+      end
     end
 
     if target and nameplate.target_strata ~= 1 then

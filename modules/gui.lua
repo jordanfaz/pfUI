@@ -1237,6 +1237,20 @@ pfUI:RegisterModule("gui", function ()
         "CENTER:" .. T["Center"],
         "RIGHT:" .. T["Right"],
       },
+      ["np_targetsymbols"] = {
+        "off:" .. T["None"],
+        "arrow:" .. T["Arrow"],
+        "triangle:" .. T["Triangle"],
+      },
+      ["np_targetsymbolsize"] = {
+        "2:200%",
+        "3:300%",
+        "4:400%",
+        "6:600%",
+        "8:800%",
+        "12:1200%",
+        "16:1600%",
+      },
       ["gryphons"] = {
         "None:"..T["None"],
         "Gryphon:"..T["Gryphon"],
@@ -2903,6 +2917,8 @@ pfUI:RegisterModule("gui", function ()
       CreateConfig(U["nameplates"], T["Draw Glow Around Target Nameplate"], C.nameplates, "targetglow", "checkbox")
       CreateConfig(U["nameplates"], T["Glow Color Around Target Nameplate"], C.nameplates, "glowcolor", "color")
       CreateConfig(U["nameplates"], T["Red Name Text On Infight Units"], C.nameplates, "namefightcolor", "checkbox")
+      CreateConfig(U["nameplates"], T["Target Nameplate Symbols"], C.nameplates, "targetsymbols", "dropdown", pfUI.gui.dropdowns.np_targetsymbols)
+      CreateConfig(U["nameplates"], T["Target Nameplate Symbol Size"], C.nameplates, "targetsymbolsize", "dropdown", pfUI.gui.dropdowns.np_targetsymbolsize)
       CreateConfig(U["nameplates"], T["Zoom Target Nameplate"], C.nameplates, "targetzoom", "checkbox")
       CreateConfig(U["nameplates"], T["Target Nameplate Zoom Factor"], C.nameplates, "targetzoomval", "dropdown", pfUI.gui.dropdowns.percent_small)
       CreateConfig(U["nameplates"], T["Nameplate Width"], C.nameplates, "width")
