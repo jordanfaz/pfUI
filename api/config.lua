@@ -289,6 +289,8 @@ function pfUI:LoadConfig()
   pfUI:UpdateConfig("unitframes", nil,           "los_indicator",    "0")
   pfUI:UpdateConfig("unitframes", nil,           "behind_indicator", "0")
   pfUI:UpdateConfig("unitframes", nil,           "hide_distance_yd", "0")
+  pfUI:UpdateConfig("unitframes", nil,           "distance_width",   "90")
+  pfUI:UpdateConfig("unitframes", nil,           "distance_height",  "20")
   pfUI:UpdateConfig("unitframes", nil,           "unitxp_notify",    "0")
   pfUI:UpdateConfig("unitframes", nil,           "track_group",      "0")
 

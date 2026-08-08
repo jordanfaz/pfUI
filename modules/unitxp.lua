@@ -144,8 +144,8 @@ pfUI:RegisterModule("unitxp", function ()
         -- Free frame mode: movable standalone frame, same as rangedisplay module
         if not pfRangeDisplay then
           local f = CreateFrame("Frame", "pfRangeDisplay", UIParent)
-          f:SetWidth(90)
-          f:SetHeight(20)
+          f:SetWidth(tonumber(C.unitframes.distance_width) or 90)
+          f:SetHeight(tonumber(C.unitframes.distance_height) or 20)
           f:SetFrameStrata("MEDIUM")
           f:SetPoint("CENTER", UIParent, "CENTER", 0, -100)
           CreateBackdrop(f, nil, true)
@@ -169,6 +169,9 @@ pfUI:RegisterModule("unitxp", function ()
 
           local throttle = 0
           local scanner = CreateFrame("Frame")
+          -- expose the poller frame so PLAYER_LOGOUT can stop its UnitXP OnUpdate
+          -- (it lives on this separate frame, not on distanceIndicator) -> crash 132
+          pfUI.uf.target.distanceScanner = scanner
           scanner:SetScript("OnUpdate", function()
             throttle = throttle + arg1
             if throttle < 0.05 then return end
@@ -235,6 +238,10 @@ pfUI:RegisterModule("unitxp", function ()
         end
         if pfUI.uf.target.distanceIndicator then
           pfUI.uf.target.distanceIndicator:SetScript("OnUpdate", nil)
+        end
+        -- free-frame mode polls from its own scanner frame, not the indicator
+        if pfUI.uf.target.distanceScanner then
+          pfUI.uf.target.distanceScanner:SetScript("OnUpdate", nil)
         end
       end
       return

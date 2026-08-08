@@ -2190,6 +2190,8 @@ pfUI:RegisterModule("gui", function ()
       CreateConfig(nil, T["Show Distance of Target"], C.unitframes, "distance_indicator", "checkbox", nil, nil, nil, nil)
       CreateConfig(nil, T["Hide yd characters"], C.unitframes, "hide_distance_yd", "checkbox", nil, nil, nil, nil)
       CreateConfig(nil, T["Hook Distance to Portrait Frame"], C.unitframes, "distance_hook_portrait", "checkbox", nil, nil, nil, nil)
+      CreateConfig(nil, T["Distance Panel Width"], C.unitframes, "distance_width")
+      CreateConfig(nil, T["Distance Panel Height"], C.unitframes, "distance_height")
       CreateConfig(nil, T["Enable OS Notifications"], C.unitframes, "unitxp_notify", "checkbox", nil, nil, nil, nil)
     end)
 
