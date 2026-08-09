@@ -40,7 +40,7 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 | `modules/buffwatch.lua` | `fcache` is built once per config table and never invalidated, so ctrl/shift-clicking a skill onto the whitelist or blacklist did nothing until reload. (`f65f897c`) |
 | `modules/firstrun.lua` | Three chat-setup steps printed "Chat module is disabled" and then carried on into the nil `pfUI.chat` they had just tested for. (`1af427e3`) |
 | `libs/libpredict.lua` | `UKNOWNBEING` / `UNKOWNBEING` — misspelled, so both resolve to nil and the guards never matched. (`4068110d`) |
-| `modules/superwow.lua` | `SUPERWOW_VERSION == "1.5"` exact string compare silently drops the hook on any later release. (`82a37752`) |
+| `modules/superwow.lua` | `SUPERWOW_VERSION == "1.5"` exact string compare. **Not hypothetical — SuperWoW here is 2.2** (`SUPERWOW_VERSION="2.2"` is embedded in `SuperWoWhook.dll`), so the test was already false and the GUID-to-name combat-text hook was dead. (`82a37752`) |
 | `api/api.lua` + `init/modules.xml` | `GetPerfectPixel` measured against the `uiScale` CVar, which caps at 1.0 while the Huge/Large presets push `UIParent` past it — wrong border thickness. Compounded by `pixelperfect` loading 56th, so the first call cached the previous scale. (`dac2d341`, `dd89a210`) |
 | `modules/unitxp.lua`, `modules/raid.lua` | `pfUI.env` has `__index` but no `__newindex`, so a bare global assignment inside a `RegisterModule` closure never reaches `_G`. Cost the `BattlefieldFrame_Show` override and `GROUP_REPLACE_PARTY`. (`617c8320`) |
 | `modules/bags.lua` | Two byte-identical `frame.search` `OnHide` handlers installed back to back; the second overwrote the first. (`e7765044`) |
