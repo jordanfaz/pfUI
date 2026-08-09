@@ -31,6 +31,7 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 ### Silently wrong behaviour
 | | |
 |---|---|
+| `api/unitframes.lua` | **`pfUI.uf.OnEnter`/`OnLeave` were deleted and no `OnEnter` is set on the unit frames at all** (only on buff/debuff icons). The old handler called SuperWoW's `SetMouseoverUnit`, so hovering a unit frame no longer sets the native mouseover unit: **every `@mouseover` macro works over 3D units and silently does nothing over the frames.** `SetAttribute("unit")` covers this fork's own mouseover but not third-party macro addons reading the real token. The unit tooltip went with the same handler, leaving the GUI's *Show Tooltip* checkbox wired to nothing. Verified in game: with the handler restored, hovering a frame reports `token:<unitname>`; without it, nil. (`45th`) |
 | `modules/chat.lua` | Whisper detection tests for the colour code at position 1, but the timestamp is prepended **first** — so with timestamps enabled *every* whisper failed detection, losing both the recolour and the correct history entry. (`4b69d597`) |
 | `modules/macrotweak.lua:16` | `if ChatFrameEditBox._AddHistoryLine then` — that field is the backup slot **this block creates**, so it is nil until the block runs. The chat-history filter therefore never installed at all. (`4068110d`) |
 | `modules/mapreveal.lua` | `explorecaches` is keyed by the plain area name, but the hover frame carried only a decorated `"map (area)"` string, so every lookup missed and the hover highlight never fired. (`5e6fe969`) |
