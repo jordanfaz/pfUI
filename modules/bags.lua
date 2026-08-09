@@ -479,8 +479,16 @@ pfUI:RegisterModule("bags", function ()
     pfUI.bags[bag].slots[slot].frame.qtext:SetText("")
 
     local bindLabel = ""
-    if texture and C.appearance.bags.showbind ~= "0" and bindType then
-      bindLabel = (bindType == 2 and "BoE") or (bindType == 3 and "BoU") or ""
+    if texture and C.appearance.bags.showbind ~= "0" and (bindType == 2 or bindType == 3) then
+      -- bindType describes the item TEMPLATE ("this kind of item binds on equip"),
+      -- not this copy. Once it has actually bound, the item is soulbound and the
+      -- label would be a lie -- so check the per-instance bit as well.
+      -- C_Item.IsBound reads the client's soulbound flag directly; before ClassicAPI
+      -- the only way was a scan-tooltip compare against the localised ITEM_SOULBOUND
+      -- string, which was slow and locale-fragile.
+      if not C_Item.IsBound({ bagID = bag, slotIndex = slot }) then
+        bindLabel = (bindType == 2 and "BoE") or "BoU"
+      end
     end
     pfUI.bags[bag].slots[slot].frame.boetext:SetText(bindLabel)
     if bindLabel ~= "" then
