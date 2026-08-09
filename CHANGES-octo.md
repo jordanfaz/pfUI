@@ -82,6 +82,13 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
   `WorldFrame` children — both measured. A texture takes an explicit width/height and has
   no ceiling, so the size multiplier finally does something. Art, size, gap and colour are
   configurable. (`ec8ce272` and follow-ups)
+- **BoE / BoU labels on bag and bank items**, tinted with the item's quality colour.
+  Reads `bindType` from the `C_Item.GetItemInfo` call the slot update already makes for
+  its quality scan, so it costs no extra lookup — and checks `C_Item.IsBound` for the
+  per-instance soulbound bit, since `bindType` describes the item *template* and would
+  otherwise keep saying BoE after the item had bound. Pre-ClassicAPI this needed a
+  scan-tooltip compare against the localised `ITEM_SOULBOUND` string on every slot.
+  Toggle: *Bags & Bank → Show BoE / BoU On Items*.
 - **Castbar drawn above the unit frame stack** — it sat at frame level 8 against buff icons
   at 12, cooldown spirals at 14 and unit texts at 16, so a castbar placed over the aura rows
   was drawn underneath them. Now 20. (`9551cf3c`)
