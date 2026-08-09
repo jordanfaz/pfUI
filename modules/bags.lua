@@ -386,6 +386,7 @@ pfUI:RegisterModule("bags", function ()
       pfUI.bags[bag].slots[slot] = {}
       pfUI.bags[bag].slots[slot].frame = CreateFrame("Button", "pfBag" .. bag .. "item" .. slot,  pfUI.bags[bag], tpl)
       pfUI.bags[bag].slots[slot].frame.qtext = pfUI.bags[bag].slots[slot].frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+      pfUI.bags[bag].slots[slot].frame.boetext = pfUI.bags[bag].slots[slot].frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 
       pfUI.bags[bag].slots[slot].frame:SetNormalTexture("")
       pfUI.bags[bag].slots[slot].bag = bag
@@ -421,6 +422,12 @@ pfUI:RegisterModule("bags", function ()
       questText:SetPoint("TOPLEFT", 0, 0)
       questText:SetTextColor(1, .8, .2, 1)
 
+      -- bind-type label, bottom-left so it clears the quest "?" and the stack count
+      local boeText = pfUI.bags[bag].slots[slot].frame.boetext
+      boeText:SetFont(pfUI.font_default, 9, "THICKOUTLINE")
+      boeText:SetPoint("BOTTOMLEFT", 1, 1)
+      boeText:SetTextColor(.4, .8, 1, 1)
+
       local countFrame = _G[pfUI.bags[bag].slots[slot].frame:GetName() .. "Count"]
       countFrame:SetFont(pfUI.font_unit, C.global.font_unit_size, "OUTLINE")
       countFrame:SetAllPoints()
@@ -454,7 +461,9 @@ pfUI:RegisterModule("bags", function ()
       end
     end
 
-    local _, _, q, _, _, _, itype = C_Item.GetItemInfo(itemID)
+    -- field 14 is bindType: 0 none, 1 BoP, 2 BoE, 3 BoU, 4 quest. Free here --
+    -- this GetItemInfo call already happens for the quality scan below.
+    local _, _, q, _, _, _, itype, _, _, _, _, _, _, bindType = C_Item.GetItemInfo(itemID)
 
     -- running advanced item color scan
     if C.appearance.bags.borderonlygear == "0" and texture and quality and quality < 1 then
@@ -468,6 +477,18 @@ pfUI:RegisterModule("bags", function ()
     local hasItem = texture and 1 or nil
     pfUI.bags[bag].slots[slot].frame.hasItem = hasItem
     pfUI.bags[bag].slots[slot].frame.qtext:SetText("")
+
+    if texture and C.appearance.bags.showbind ~= "0" and bindType then
+      if bindType == 2 then
+        pfUI.bags[bag].slots[slot].frame.boetext:SetText("BoE")
+      elseif bindType == 3 then
+        pfUI.bags[bag].slots[slot].frame.boetext:SetText("BoU")
+      else
+        pfUI.bags[bag].slots[slot].frame.boetext:SetText("")
+      end
+    else
+      pfUI.bags[bag].slots[slot].frame.boetext:SetText("")
+    end
 
     ContainerFrame_UpdateCooldown(bag, pfUI.bags[bag].slots[slot].frame)
 
