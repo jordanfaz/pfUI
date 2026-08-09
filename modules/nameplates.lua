@@ -304,15 +304,35 @@ pfUI:RegisterModule("nameplates", function ()
     end
   end
 
-  local function TotemPlate(name)
-    if C.nameplates.totemicons == "1" then
-      for totem, icon in pairs(L["totems"]) do
-        if string.find(name, totem) then return icon end
-      end
+  -- Numeric CreatureType.dbc id for the plate's unit (8 = Critter, 11 = Totem).
+  -- It's fixed per unit, so cache it and reset on plate reuse. nil while the GUID
+  -- can't resolve yet (incl. the no-SuperWoW case, where cachedGuid is empty).
+  -- Locale-proof and covers custom units for free -- no name tables needed.
+  local function CreatureType(plate)
+    local guid = plate.cachedGuid
+    if not guid or guid == "" then return nil end
+    if not plate.creatureType then
+      plate.creatureType = UnitCreatureTypeID(guid)  -- nil retries next call
     end
+    return plate.creatureType
   end
 
-  local function HidePlate(unittype, name, fullhp, target)
+  -- Totem icon, read straight from the game:
+  --   * Passive totems self-cast their provided buff, so they carry exactly one
+  --     aura whose icon IS the totem's icon (Totem::Summon TOTEM_PASSIVE).
+  --   * Active totems (Searing/Magma/Fire Nova) cast at enemies and hold no
+  --     self-aura, so their icon arrives via UNIT_SPELLCAST_SUCCEEDED (cached
+  --     into plate.totemIcon by the event handler); nil here until then.
+  local function TotemPlate(plate)
+    if C.nameplates.totemicons ~= "1" then return nil end
+    if CreatureType(plate) ~= 11 then return nil end
+    if plate.totemIcon then return plate.totemIcon end
+    local aura = C_UnitAuras.GetBuffDataByIndex(plate.cachedGuid, 1)
+    if aura then plate.totemIcon = aura.icon end
+    return plate.totemIcon
+  end
+
+  local function HidePlate(unittype, fullhp, target, plate)
     -- keep some plates always visible according to config
     if C.nameplates.fullhealth == "1" and not fullhp then return nil end
     if C.nameplates.target == "1" and target then return nil end
@@ -328,14 +348,10 @@ pfUI:RegisterModule("nameplates", function ()
       return true
     elseif C.nameplates.friendlyplayer == "1" and unittype == "FRIENDLY_PLAYER" then
       return true
-    elseif C.nameplates.critters == "1" and unittype == "NEUTRAL_NPC" then
-      for i, critter in pairs(L["critters"]) do
-        if string.lower(name) == string.lower(critter) then return true end
-      end
-    elseif C.nameplates.totems == "1" then
-      for totem in pairs(L["totems"]) do
-        if string.find(name, totem) then return true end
-      end
+    elseif C.nameplates.critters == "1" and CreatureType(plate) == 8 then
+      return true
+    elseif C.nameplates.totems == "1" and CreatureType(plate) == 11 then
+      return true
     end
 
     -- nothing to hide
@@ -504,6 +520,7 @@ nameplates:RegisterEvent("UNIT_SPELLCAST_START")
 nameplates:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 nameplates:RegisterEvent("UNIT_SPELLCAST_STOP")
 nameplates:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
+nameplates:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 nameplates:RegisterEvent("PLAYER_GUILD_UPDATE")
 nameplates:RegisterEvent("PLAYER_REGEN_DISABLED")
 nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -596,6 +613,8 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
         local guid = UnitGUID(arg1)
         plate.nameplate.cachedGuid = guid
         plate.nameplate.unit = arg1
+        plate.nameplate.creatureType = nil  -- recompute for the new unit
+        plate.nameplate.totemIcon = nil
         if guid then
           plateByGuid[guid] = plate.nameplate
           -- Seed: the unit may already be mid-cast (its UNIT_SPELLCAST_START
@@ -670,6 +689,22 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
           castState[guid] = nil
           local plate = plateByGuid[guid]
           if plate then plate.castUpdate = true end
+        end
+      end
+
+    elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
+      -- Active totems (Searing/Magma/Fire Nova) carry no self-aura, so their
+      -- attack cast is the only icon source. Capture it once per totem, gated on
+      -- creature type so a normal caster's spell never styles it as a totem.
+      if arg1 and strfind(arg1, "^nameplate") then
+        local guid = UnitGUID(arg1)
+        local plate = guid and plateByGuid[guid]
+        if plate and not plate.totemIcon and arg3 and CreatureType(plate) == 11 then
+          local tex = C_Spell.GetSpellTexture(arg3)
+          if tex then
+            plate.totemIcon = tex
+            plate.castUpdate = true  -- re-render now so the icon shows
+          end
         end
       end
 
@@ -1128,11 +1163,11 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
     end
 
     -- hide frames according to the configuration
-    local TotemIcon = TotemPlate(name)
+    local TotemIcon = TotemPlate(plate)
 
     if TotemIcon then
-      -- create totem icon
-      plate.totem.icon:SetTexture("Interface\\Icons\\" .. TotemIcon)
+      -- icon resolved from the totem's aura / attack cast (already a full path)
+      plate.totem.icon:SetTexture(TotemIcon)
 
       plate.glow:Hide()
       plate.level:Hide()
@@ -1140,7 +1175,7 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
       plate.health:Hide()
       plate.guild:Hide()
       plate.totem:Show()
-    elseif HidePlate(unittype, name, (hpmax-hp == hpmin), target) then
+    elseif HidePlate(unittype, (hpmax-hp == hpmin), target, plate) then
       plate.level:SetPoint("RIGHT", plate.name, "LEFT", -3, 0)
       plate.name:SetParent(plate)
       plate.guild:SetPoint("BOTTOM", plate.name, "BOTTOM", -2, -(font_size + 2))
@@ -1247,12 +1282,11 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
 
     local r, g, b, a = unpack(unitcolors[unittype])
 
-    if class then
-      if unittype == "ENEMY_PLAYER" and C.nameplates["enemyclassc"] == "1" then
-        r, g, b, a = PFUI_CLASS_COLORS[class]:GetRGBA()
-      elseif unittype == "FRIENDLY_PLAYER" and C.nameplates["friendclassc"] == "1" then
-        r, g, b, a = PFUI_CLASS_COLORS[class]:GetRGBA()
-      end
+    if class and (
+      (unittype == "ENEMY_PLAYER" and C.nameplates["enemyclassc"] == "1") or
+      (unittype == "FRIENDLY_PLAYER" and C.nameplates["friendclassc"] == "1")
+    ) then
+      r, g, b, a = PFUI_CLASS_COLORS[class]:GetRGBA()
     end
 
     if unitstr and UnitIsTapped(unitstr) and not UnitIsTappedByPlayer(unitstr) then
@@ -1278,10 +1312,15 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
       plate.cache.namecolor = r + g + b
     end
 
-    -- update combopoints
-    for i=1, 5 do plate.combopoints[i]:Hide() end
     if target and C.nameplates.cpdisplay == "1" then
-      for i=1, GetComboPoints("target") do plate.combopoints[i]:Show() end
+      local cp = GetComboPoints("target")
+      if plate.cpShown ~= cp then
+        for i=1, 5 do plate.combopoints[i]:SetShown(i <= cp) end
+        plate.cpShown = cp
+      end
+    elseif plate.cpShown then
+      for i=1, 5 do plate.combopoints[i]:Hide() end
+      plate.cpShown = nil
     end
 
     -- update debuffs
