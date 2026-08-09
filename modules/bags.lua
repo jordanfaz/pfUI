@@ -478,16 +478,18 @@ pfUI:RegisterModule("bags", function ()
     pfUI.bags[bag].slots[slot].frame.hasItem = hasItem
     pfUI.bags[bag].slots[slot].frame.qtext:SetText("")
 
+    local bindLabel = ""
     if texture and C.appearance.bags.showbind ~= "0" and bindType then
-      if bindType == 2 then
-        pfUI.bags[bag].slots[slot].frame.boetext:SetText("BoE")
-      elseif bindType == 3 then
-        pfUI.bags[bag].slots[slot].frame.boetext:SetText("BoU")
-      else
-        pfUI.bags[bag].slots[slot].frame.boetext:SetText("")
-      end
-    else
-      pfUI.bags[bag].slots[slot].frame.boetext:SetText("")
+      bindLabel = (bindType == 2 and "BoE") or (bindType == 3 and "BoU") or ""
+    end
+    pfUI.bags[bag].slots[slot].frame.boetext:SetText(bindLabel)
+    if bindLabel ~= "" then
+      -- tint by item quality, from the same source the border colour uses.
+      -- `quality` is already resolved above, including the advanced colour scan.
+      -- Truncate to three values on purpose: GetItemQualityColor's fourth return
+      -- is a hex string, which would otherwise land in the alpha argument.
+      local qr, qg, qb = GetItemQualityColor(quality or 1)
+      pfUI.bags[bag].slots[slot].frame.boetext:SetTextColor(qr, qg, qb, 1)
     end
 
     ContainerFrame_UpdateCooldown(bag, pfUI.bags[bag].slots[slot].frame)
