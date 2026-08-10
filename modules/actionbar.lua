@@ -1180,6 +1180,14 @@ pfUI:RegisterModule("actionbar", function ()
     f:SetSize(size, size)
     CreateBackdrop(f, border)
 
+    -- optional custom background for action bar buttons only; when off, the
+    -- global Appearance > Background Color keeps ruling these like everything
+    -- else. Applied after CreateBackdrop so it overrides the global fill but
+    -- leaves border colouring (slot state, equipped, range) untouched.
+    if C.bars.custombgcolor == "1" and f.backdrop then
+      f.backdrop:SetBackdropColor(GetStringColor(C.bars.background_color))
+    end
+
     return f
   end
 

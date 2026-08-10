@@ -106,6 +106,10 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 - **Castbar drawn above the unit frame stack** — it sat at frame level 8 against buff icons
   at 12, cooldown spirals at 14 and unit texts at 16, so a castbar placed over the aura rows
   was drawn underneath them. Now 20. (`9551cf3c`)
+- **Custom Action Bar Background** — an *Appearance* checkbox + colour picker that recolours
+  the action-bar button backdrops only, leaving the global *Background Color* in charge of
+  every other frame. Off by default; applied after `CreateBackdrop` so slot-state border
+  colouring is untouched.
 - **The update-notify broadcast advertises the upstream base, not the fork version.**
   Giving the toc a real version (needed so the addon list and GUI stop saying "dev")
   re-armed `updatenotify.lua`, which broadcasts on the shared `pfUI-brues` prefix — and a
