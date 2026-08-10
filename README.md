@@ -31,13 +31,15 @@ This version includes significant performance improvements and DLL-enhanced feat
 
 ## What this fork changes, briefly
 
-*(as of 2026-08-10 — details and reasoning in [CHANGES-octo.md](CHANGES-octo.md))*
+*(as of 2026-08-11 — details and reasoning in [CHANGES-octo.md](CHANGES-octo.md))*
 
 - **Use Class Color** — one toggle swaps pfUI's signature mint for your class colour,
   everywhere: logo, GUI, borders, highlights, cooldown text, stack counts
 - **Target nameplate symbols** — texture-based arrows/triangles beside the target's plate,
   sizeable past the nameplate font ceiling, with colour and gap options
 - **BoE / BoU labels** on bag and bank items, tinted by item quality; *Hide Gold* option
+- **Custom Action Bar Background** — recolour the action-bar button backdrops without
+  touching any other frame's background
 - **Per-unit offsets** for portraits, buffs and debuffs; castbar *Hide Total Timer*;
   castbars drawn above the aura rows; sizeable distance panel
 - **Hide Nameplates Out Of Combat** option
