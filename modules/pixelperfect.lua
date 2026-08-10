@@ -16,8 +16,12 @@ pfUI:RegisterModule("pixelperfect", function ()
       local scale = GetCVar("uiScale")
       local use = GetCVar("useUiScale")
 
-      if use == 1 then
-        UIParent:SetScale(tonumber(use))
+      -- GetCVar returns strings: `use == 1` could never be true, so leaving a
+      -- preset always fell through to the hardcoded 0.9 fallback -- and the
+      -- branch would then have restored the wrong variable (the flag, not the
+      -- scale).
+      if use == "1" then
+        UIParent:SetScale(tonumber(scale) or 1)
       else
         UIParent:SetScale(.9)
       end
