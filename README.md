@@ -29,6 +29,26 @@
 
 This version includes significant performance improvements and DLL-enhanced features.
 
+## What this fork changes, briefly
+
+*(as of 2026-08-10 — details and reasoning in [CHANGES-octo.md](CHANGES-octo.md))*
+
+- **Use Class Color** — one toggle swaps pfUI's signature mint for your class colour,
+  everywhere: logo, GUI, borders, highlights, cooldown text, stack counts
+- **Target nameplate symbols** — texture-based arrows/triangles beside the target's plate,
+  sizeable past the nameplate font ceiling, with colour and gap options
+- **BoE / BoU labels** on bag and bank items, tinted by item quality; *Hide Gold* option
+- **Per-unit offsets** for portraits, buffs and debuffs; castbar *Hide Total Timer*;
+  castbars drawn above the aura rows; sizeable distance panel
+- **Hide Nameplates Out Of Combat** option
+- **Performance** — cached aggro checks, throttled cooldown/reactive updates, loot-frame
+  autoresize done once instead of per-slot, empty text slots skipped in raid refreshes
+- **Safety for everyone else** — the version broadcast is pinned to the upstream release,
+  so this fork can never announce a version that doesn't exist to nearby pfUI users
+- Nearly all **bug fixes found here have already been merged upstream** (PRs #39/#40) —
+  what remains above is preference and polish. The changelog's claims are audited against
+  upstream, and the ones that turned out wrong stay visible, struck through.
+
 ## Installation
 
 > ### ⚠️ The folder **must** be named `pfUI`
