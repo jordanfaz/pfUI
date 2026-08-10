@@ -1,6 +1,6 @@
 > ### Attribution
 >
-> **This is a private downstream fork. Almost none of the work here is mine.**
+> **This is a downstream fork. Almost none of the work here is mine.**
 >
 > | | |
 > |---|---|
@@ -30,10 +30,45 @@
 This version includes significant performance improvements and DLL-enhanced features.
 
 ## Installation
-1. Download **[Latest Version](https://github.com/brues-code/pfUI/releases/latest)**
-2. Unpack the Zip file
-4. Copy "pfUI" into Wow-Directory\Interface\AddOns
-5. Restart Wow
+
+> ### ⚠️ The folder **must** be named `pfUI`
+>
+> Not `pfUI-classicAPI`, not `pfUI-classicAPI-octo`. This is the easiest way to install it
+> wrong, and it fails without telling you why. Two separate things break:
+>
+> 1. **WoW skips the addon entirely.** It only loads a folder whose name matches the `.toc`
+>    inside it. A folder called `pfUI-classicAPI` containing `pfUI.toc` simply never runs —
+>    no error, no entry in the addon list.
+> 2. **Renaming the `.toc` instead will not save you.** pfUI finds its own media directory
+>    by probing a fixed list of folder names:
+>    ```lua
+>    local tocs = { "", "-master", "-tbc", "-wotlk" }
+>    ```
+>    Anything outside that list leaves `pfUI.path` unset, and every icon, border and font
+>    path breaks.
+>
+> This also means launchers with an "add custom git addon" feature **cannot install this
+> correctly** — they name the folder after the repository. Install it by hand.
+
+**Download**
+
+1. Grab the [latest code](https://github.com/roby-brok/pfUI-classicAPI/archive/refs/heads/octo.zip) (branch `octo`)
+2. Unpack the zip — you get a folder called `pfUI-classicAPI-octo`
+3. **Rename it to `pfUI`**
+4. Move it into `Wow-Directory\Interface\AddOns`
+5. Restart WoW
+
+**Or with git**, which makes updates a `git pull`:
+
+```sh
+cd Wow-Directory/Interface/AddOns
+git clone -b octo https://github.com/roby-brok/pfUI-classicAPI.git pfUI
+```
+
+That trailing `pfUI` is what names the folder correctly.
+
+**[ClassicAPI](https://github.com/brues-code/ClassicAPI) is required** — without the DLL
+this build does not work. Keep a non-ClassicAPI pfUI around if that matters to you.
 
 ## DLL Enhancements
 
@@ -128,10 +163,20 @@ big fan of creating configuration UI's, especially not via the Wow-API
 (you might have noticed that in ShaguUI).
 
 **How can I donate?**  
-[You can buy me a coffee if you'd like](https://buymeacoffee.com/brues)
+The people who wrote this come first — [Shagu](https://github.com/sponsors/shagu) for pfUI
+itself, and [brues-code](https://buymeacoffee.com/brues) for the ClassicAPI Edition and the
+ClassicAPI DLL. If the OctoWoW patches in *this* fork have been useful to you, mine is
+[here](https://buymeacoffee.com/robybrok) — but please do the other two first.
 
 **How do I report a Bug?**  
-Please provide as much information as possible in the [Bugtracker](https://github.com/brues-code/pfUI/issues).
+**Check whether it happens on [upstream](https://github.com/brues-code/pfUI) first.** This
+fork is a thin layer on top; almost every bug belongs in
+[brues-code's tracker](https://github.com/brues-code/pfUI/issues), and reporting it there
+gets it fixed for everyone rather than just for OctoWoW. Only open an issue
+[here](https://github.com/roby-brok/pfUI-classicAPI/issues) if it is specific to something
+listed in [CHANGES-octo.md](CHANGES-octo.md).
+
+Either way — please provide as much information as possible.
 If there is an error message, provide the full content of it. Just telling that "there is an error" won't help any of us.
 Please consider adding additional information such as: since when did you got the error,
 does it still happen using a clean configuration, what other addons are loaded and which version you're running.
