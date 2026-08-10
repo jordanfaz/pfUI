@@ -98,3 +98,10 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 - **Castbar drawn above the unit frame stack** — it sat at frame level 8 against buff icons
   at 12, cooldown spirals at 14 and unit texts at 16, so a castbar placed over the aura rows
   was drawn underneath them. Now 20. (`9551cf3c`)
+- **The update-notify broadcast advertises the upstream base, not the fork version.**
+  Giving the toc a real version (needed so the addon list and GUI stop saying "dev")
+  re-armed `updatenotify.lua`, which broadcasts on the shared `pfUI-brues` prefix — and a
+  stock build turns any higher number it hears into an update notice pointing at a release
+  that would not exist. The advertised number is now pinned to the merged upstream release
+  (`90018` = v9.0.18) independently of the toc, the same shielding OWThreat's `compatVer`
+  does. **Maintenance rule: bump the constant when an upstream sync lands.**

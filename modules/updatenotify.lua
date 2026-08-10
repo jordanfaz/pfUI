@@ -2,7 +2,15 @@ pfUI:RegisterModule("updatenotify", function ()
   if pfUI.version.string == "dev" then return end
 
   local alreadyshown
-  local localversion  = tonumber(pfUI.version.major*10000 + pfUI.version.minor*100 + pfUI.version.fix)
+  -- The version advertised and compared on the shared channel is the UPSTREAM
+  -- release this fork is based on, NOT the fork's own toc version. A stock
+  -- brues-code build turns any higher number it hears into a "new version
+  -- available" notice pointing at upstream's releases page, so a fork version
+  -- running ahead of upstream would send every nearby pfUI user chasing a
+  -- release that does not exist. The toc version is free to say anything;
+  -- this constant only moves when an upstream sync lands, encoded
+  -- major*10000 + minor*100 + fix. (Same pattern as OWThreat's compatVer.)
+  local localversion  = 90018 -- brues-code/pfUI v9.0.18
   local remoteversion = tonumber(pfUI_init.updateavailable) or 0
   local loginchannels = { "BATTLEGROUND", "RAID", "GUILD" }
   local groupchannels = { "BATTLEGROUND", "RAID" }
