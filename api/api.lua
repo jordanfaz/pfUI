@@ -1113,11 +1113,16 @@ function pfUI.api.GetPerfectPixel()
   screenheight = tonumber(screenheight)
 
   if pfUI_config.appearance.border.pixelperfect == "1" and screenheight then
-    -- The uiScale cvar is not a reliable source: it is capped at 1.0 while both
-    -- the pixelperfect module and the firstrun slider push UIParent past it via
-    -- SetScale, and it is ignored completely while useUiScale is off. Ask the
-    -- frame itself instead, it always reports what is really on screen.
-    local scale = UIParent:GetEffectiveScale()
+    -- The uiScale cvar, matching upstream -- NOT UIParent:GetEffectiveScale().
+    -- This fork briefly measured the frame instead, on the premise that the cvar
+    -- clamps at 1.0 while SetScale pushes past it; upstream reverted that in
+    -- 9cabdf29 on the same premise, read the other way round. Measured on the
+    -- OctoWoW client 2026-08-10, the premise is false for both of them:
+    -- SetCVar("uiScale", 1.4222) sticks (cvar=1.4222, effective=1.4222), so the
+    -- two sources agree here and the cvar read is the zero-drift choice. On
+    -- clients that do clamp (stock 1.12 registers uiScale as 0.64-1.0), the
+    -- cvar read is also what keeps 1px borders from vanishing at large presets.
+    local scale = GetCVar("useUiScale") == "1" and tonumber(GetCVar("uiScale")) or 1
     if not scale or scale <= 0 then scale = 1 end
 
     pfUI.pixel = 768 / screenheight / scale
