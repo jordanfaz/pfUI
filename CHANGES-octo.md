@@ -1,7 +1,12 @@
 # Changes on top of brues-code/pfUI
 
 Everything on the `octo` branch that is not in
-[brues-code/pfUI](https://github.com/brues-code/pfUI) — **42 files, +489 / −194**.
+[brues-code/pfUI](https://github.com/brues-code/pfUI) — **38 files, +627 / −160**,
+measured against upstream `6e1f8095`.
+
+The delta shrank rather than grew: most of section 1 has been merged upstream (PRs
+[#39](https://github.com/brues-code/pfUI/pull/39) and
+[#40](https://github.com/brues-code/pfUI/pull/40)), so those files no longer differ.
 
 Section 1 is **bugs in the upstream tree**: they affect every user of that fork, not just
 OctoWoW, and are the part worth pulling upstream. Sections 2–4 are local preferences and
