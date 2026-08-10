@@ -1444,43 +1444,6 @@ function pfUI.uf:CreateUnitFrame(unit, id, config, tick)
     f:SetAttribute("unit", f.label .. f.id)
   end
 
-  -- Publish the hovered unit as the native mouseover unit (SuperWoW). This fork
-  -- dropped pfUI.uf.OnEnter/OnLeave, so hovering a unit frame stopped setting the
-  -- mouseover unit at all: @mouseover macros still worked over 3D units but did
-  -- nothing over the frames, with no error. SetAttribute("unit") alone does not
-  -- cover it for macro addons that read the real token.
-  --
-  -- Set here, at frame creation, rather than in EnableScripts: UpdateConfig re-runs
-  -- EnableScripts and would discard any OnEnter another addon layered on top
-  -- (SuperCleveRoidMacros wraps this script on PLAYER_ENTERING_WORLD).
-  if SetMouseoverUnit then
-    local prevEnter, prevLeave = f:GetScript("OnEnter"), f:GetScript("OnLeave")
-    f:SetScript("OnEnter", function()
-      if this.label then
-        local unitstr = this.label .. this.id
-        if string.find(this.label, "^0x") then
-          SetMouseoverUnit(this.label)
-        elseif UnitExists(unitstr) then
-          SetMouseoverUnit(unitstr)
-        end
-
-        -- the unit tooltip went with the same deleted handler, leaving the
-        -- "Show Tooltip" checkbox in the GUI wired to nothing
-        if this.config and this.config.showtooltip ~= "0" and UnitExists(unitstr) then
-          GameTooltip_SetDefaultAnchor(GameTooltip, this)
-          GameTooltip:SetUnit(unitstr)
-          GameTooltip:Show()
-        end
-      end
-      if prevEnter then prevEnter() end
-    end)
-    f:SetScript("OnLeave", function()
-      SetMouseoverUnit()
-      GameTooltip:FadeOut()
-      if prevLeave then prevLeave() end
-    end)
-  end
-
   -- register frame for clique
   _G.ClickCastFrames = ClickCastFrames or {}
   ClickCastFrames[f] = true
