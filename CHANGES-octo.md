@@ -75,6 +75,14 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
   (`c64b3593`, `9c047555`, `5aedfffe`, `161f48dd`)
   *Note: literals inside `T[...]` translation keys are deliberately left alone — rewriting
   the key at runtime makes the lookup miss and breaks localised clients.*
+  - *Follow-up 2026-08-10:* the literal sweep could not catch signature colours living in
+    **config defaults**, which materialise into SavedVariables and then colour text at
+    runtime — found as cyan `73m` cooldown text on buff icons. Two existed:
+    `appearance.cd.minutecolor` (`.2,1,1`, the palette's cyan sibling) and
+    `bars.count_color` (true mint, action-bar stack counts). Both now follow the accent —
+    but **only while the option still holds its stock default** and the toggle is on; a
+    user-picked colour always wins, and the hour/day blues stay untouched because those
+    are semantic unit-at-a-glance colours, not palette.
 - **Hide Nameplates Out Of Combat** (`8bbae7d8`)
 - **Per-unit portrait / buff / debuff X-Y offsets** — six keys, anchors were hardcoded to 0 (`9e54fd11`)
 - **Hide Total Timer** for player, target and focus castbars (`f09003f7`)

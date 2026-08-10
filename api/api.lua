@@ -1546,8 +1546,16 @@ function pfUI.api.GetColoredTimeString(remaining)
   -- Show minutes if remaining is > 99 Seconds (99)
   elseif remaining > 99 then
     if not color_minute then
-      local r,g,b,a = pfUI.api.GetStringColor(C.appearance.cd.minutecolor)
-      color_minute = pfUI.api.rgbhex(r,g,b)
+      -- The stock minute color is the signature palette's cyan sibling. While
+      -- the option still holds its default AND Use Class Color is on, follow
+      -- the accent; any user-picked value wins unchanged. The hour/day blues
+      -- are semantic (unit-at-a-glance) and deliberately stay.
+      if C.appearance.border.classcolor == "1" and C.appearance.cd.minutecolor == ".2,1,1,1" then
+        color_minute = pfUI.api.rgbhex(pfUI.cr, pfUI.cg, pfUI.cb)
+      else
+        local r,g,b,a = pfUI.api.GetStringColor(C.appearance.cd.minutecolor)
+        color_minute = pfUI.api.rgbhex(r,g,b)
+      end
     end
 
     return color_minute .. round(remaining / 60) .. "|rm"
