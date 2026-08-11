@@ -8,8 +8,10 @@ pfUI:RegisterModule("updatenotify", function ()
   -- available" notice pointing at upstream's releases page, so a fork version
   -- running ahead of upstream would send every nearby pfUI user chasing a
   -- release that does not exist. The toc version is free to say anything;
-  -- this constant only moves when an upstream sync lands, encoded
-  -- major*10000 + minor*100 + fix. (Same pattern as OWThreat's compatVer.)
+  -- this constant only moves when the merged upstream RELEASE changes --
+  -- commit-level syncs do not move it (v9.0.18 was still latest at the
+  -- 2026-08-11 sync). Encoded major*10000 + minor*100 + fix. (Same pattern
+  -- as OWThreat's compatVer.)
   local localversion  = 90018 -- brues-code/pfUI v9.0.18
   local remoteversion = tonumber(pfUI_init.updateavailable) or 0
   local loginchannels = { "BATTLEGROUND", "RAID", "GUILD" }

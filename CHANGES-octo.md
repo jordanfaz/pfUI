@@ -1,8 +1,8 @@
 # Changes on top of brues-code/pfUI
 
 Everything on the `octo` branch that is not in
-[brues-code/pfUI](https://github.com/brues-code/pfUI) — **38 files, +627 / −160**,
-measured against upstream `6e1f8095`.
+[brues-code/pfUI](https://github.com/brues-code/pfUI) — **40 files, +693 / −149**,
+measured against upstream `afdb6c38` (2026-08-11).
 
 The delta shrank rather than grew: most of section 1 has been merged upstream (PRs
 [#39](https://github.com/brues-code/pfUI/pull/39) and
@@ -58,7 +58,7 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 
 | | |
 |---|---|
-| `UnitHasAggro` | Concatenated `<u>target` / `<u>targettarget` per call per unit though `pfValidUnits` never changes after load, and cached only *positive* results — so the common case (nothing has aggro) rescanned the whole unit table on every call. Static triple list + a 0.3s negative cache. (`6645b031`) |
+| `UnitHasAggro` | Concatenated `<u>target` / `<u>targettarget` per call per unit though `pfValidUnits` never changes after load, and cached only *positive* results — so the common case (nothing has aggro) rescanned the whole unit table on every call. Static triple list + a 0.3s negative cache. (`6645b031`) **Cherry-picked upstream by brues on 2026-08-11 (`afdb6c38`), authorship preserved — no longer part of this fork's delta.** |
 | `GetStatusValue` | Ran `GetUnitStats` and the whole formatting path for text slots set to `none`, then returned `""`. 40 raid frames × 6 slots per refresh. (`ad5353e4`) |
 | `cooldown` | `GetParent` + `GetName` + a concat + two `_G` lookups **before** the 0.1s throttle could bail — every frame, per cooldown frame. (`c5bc9599`) |
 | `loot` autoresize | The hook sat inside the per-slot creation loop, so **every slot frame** got an `OnUpdate` rebuilding the entire loot frame. N rebuilds per frame. (`5210b122`) |
