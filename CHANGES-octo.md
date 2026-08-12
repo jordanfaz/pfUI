@@ -79,10 +79,13 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
     **config defaults**, which materialise into SavedVariables and then colour text at
     runtime — found as cyan `73m` cooldown text on buff icons. Two existed:
     `appearance.cd.minutecolor` (`.2,1,1`, the palette's cyan sibling) and
-    `bars.count_color` (true mint, action-bar stack counts). Both now follow the accent —
-    but **only while the option still holds its stock default** and the toggle is on; a
-    user-picked colour always wins, and the hour/day blues stay untouched because those
-    are semantic unit-at-a-glance colours, not palette.
+    `bars.count_color` (true mint, action-bar stack counts). The cooldown minute colour
+    follows the accent — but **only while the option still holds its stock default** and
+    the toggle is on; a user-picked colour always wins, and the hour/day blues stay
+    untouched because those are semantic unit-at-a-glance colours, not palette.
+  - *Reverted 2026-08-12:* the `bars.count_color` half. The action-bar stack counts keep
+    their configured colour regardless of the accent toggle — Roby wants the counts left
+    alone, and the mint there reads as information, not palette.
 - **Hide Nameplates Out Of Combat** (`8bbae7d8`)
 - **Per-unit portrait / buff / debuff X-Y offsets** — six keys, anchors were hardcoded to 0 (`9e54fd11`)
 - **Hide Total Timer** for player, target and focus castbars (`f09003f7`)

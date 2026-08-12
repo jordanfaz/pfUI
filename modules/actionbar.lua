@@ -994,13 +994,9 @@ pfUI:RegisterModule("actionbar", function ()
     local macro_color = { GetStringColor(C.bars.macro_color) }
 
     local count_size = tonumber(C.bars.count_size)
+    -- the stack count stays its configured color; the class-color accent
+    -- deliberately does NOT reach it (Roby, 2026-08-12)
     local count_color = { GetStringColor(C.bars.count_color) }
-    -- stock stack-count color is the signature mint; while it still holds its
-    -- default and Use Class Color is on, follow the accent (a user-picked
-    -- value wins unchanged)
-    if C.appearance.border.classcolor == "1" and C.bars.count_color == ".2,1,.8,1" then
-      count_color = { pfUI.cr, pfUI.cg, pfUI.cb, 1 }
-    end
 
     local bind_size = tonumber(C.bars.bind_size)
     local bind_color = { GetStringColor(C.bars.bind_color) }
