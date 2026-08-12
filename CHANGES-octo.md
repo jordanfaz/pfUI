@@ -1,8 +1,9 @@
 # Changes on top of brues-code/pfUI
 
 Everything on the `octo` branch that is not in
-[brues-code/pfUI](https://github.com/brues-code/pfUI) — **41 files, +779 / −151**,
-measured against upstream `afdb6c38` (2026-08-12).
+[brues-code/pfUI](https://github.com/brues-code/pfUI) — **41 files, +784 / −160**,
+measured against upstream `afdb6c38` (2026-08-13, after syncing his loothistory
+class-colours, 40-yard rangecheck default and click-to-macro binding).
 
 The delta shrank rather than grew: most of section 1 has been merged upstream (PRs
 [#39](https://github.com/brues-code/pfUI/pull/39) and
