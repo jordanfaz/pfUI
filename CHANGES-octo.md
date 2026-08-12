@@ -1,8 +1,8 @@
 # Changes on top of brues-code/pfUI
 
 Everything on the `octo` branch that is not in
-[brues-code/pfUI](https://github.com/brues-code/pfUI) — **40 files, +693 / −149**,
-measured against upstream `afdb6c38` (2026-08-11).
+[brues-code/pfUI](https://github.com/brues-code/pfUI) — **41 files, +779 / −151**,
+measured against upstream `afdb6c38` (2026-08-12).
 
 The delta shrank rather than grew: most of section 1 has been merged upstream (PRs
 [#39](https://github.com/brues-code/pfUI/pull/39) and
@@ -117,3 +117,9 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
   that would not exist. The advertised number is now pinned to the merged upstream release
   (`90018` = v9.0.18) independently of the toc, the same shielding OWThreat's `compatVer`
   does. **Maintenance rule: bump the constant when an upstream sync lands.**
+- **[OWThreat](https://github.com/roby-brok/OWThreat) docks and skins like TWThreat.** The
+  stock integration hooks the addon name `TWThreat` and the `TWT*` globals, so the renamed
+  fork (`OWTMain`, `OWT_CONFIG`) never docked into the right chat panel. A parallel hook
+  now registers it with the same meters dock, driven by the same `twt` config keys — the
+  *Thirdparty* checkboxes are relabelled *TW/OW Threatmeter* and cover whichever is
+  installed.
