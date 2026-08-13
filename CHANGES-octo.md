@@ -55,6 +55,12 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 
 ---
 
+### Defaults kept against upstream
+
+| | |
+|---|---|
+| `unitframes.rangecheck` | Upstream flipped the 40-yard range fade to on-by-default (`af6893c1`). Kept **off** here: pfUI only saves values that differ from defaults, so the flip silently enabled the fade for every user who had it "off" without ever touching the option. Turn it on per character under *Unit Frames* if wanted. |
+
 ## 2. Performance
 
 | | |
