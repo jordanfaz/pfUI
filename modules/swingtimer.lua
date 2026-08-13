@@ -25,6 +25,7 @@ pfUI:RegisterModule("swingtimer", function ()
     hsSeenCurrent = false, cleaveSeenCurrent = false, maulSeenCurrent = false,
     isWarrior = false,
     isDruid = false,
+    sawOffhandFlag = false,
     cachedHSSlots = {}, cachedCleaveSlots = {}, cachedMaulSlots = {},
     useSpellQueueEvent = false,
     swingThrottle = 0,
@@ -841,6 +842,8 @@ pfUI:RegisterModule("swingtimer", function ()
   events:RegisterEvent("SPELL_QUEUE_EVENT")
   events:RegisterEvent("START_AUTOATTACK")
   events:RegisterEvent("STOP_AUTOATTACK")
+  events:RegisterEvent("PLAYER_ENTER_COMBAT")
+  events:RegisterEvent("PLAYER_LEAVE_COMBAT")
   events:RegisterEvent("UNIT_ATTACK_SPEED")
 
   events:SetScript("OnEvent", function()
@@ -854,6 +857,25 @@ pfUI:RegisterModule("swingtimer", function ()
       if noAction then
         if isOffhand and S.ohActive then return end
         if not isOffhand and S.mhActive then return end
+      end
+
+      -- Hand attribution. Trust the LEFTSWING flag once it has proven itself
+      -- this session; if the server never sets it, every off-hand hit arrives
+      -- flagged as mainhand and resets the MH bar at ~half its duration (the
+      -- "bar only ever fills halfway" report on dual wield). Until the first
+      -- flagged off-hand hit is seen, re-attribute a mainhand-flagged hit to
+      -- the off hand when the MH bar is nowhere near due but the OH bar is --
+      -- the crosstalk signature. Extra attacks don't match it: they land with
+      -- the just-swung hand near-full and the other hand mid-bar.
+      if isOffhand then S.sawOffhandFlag = true end
+      if not isOffhand and not S.sawOffhandFlag
+        and S.mhActive and S.ohActive
+        and S.mhTimerMax > 0 and S.ohTimerMax > 0 then
+        local remMH = S.mhTimer / S.mhTimerMax
+        local remOH = S.ohTimer / S.ohTimerMax
+        if remMH > 0.35 and remOH < 0.20 then
+          isOffhand = true
+        end
       end
 
       -- Extra attack detection: genuine extra attacks (Windfury, Reckoning,
@@ -917,10 +939,18 @@ pfUI:RegisterModule("swingtimer", function ()
         S.hsQueued = false; S.cleaveQueued = false; S.maulQueued = false
       end
 
-    elseif event == "START_AUTOATTACK" then
+    elseif event == "START_AUTOATTACK" or event == "PLAYER_ENTER_COMBAT" then
+      -- PLAYER_ENTER_COMBAT is the vanilla auto-attack-toggled-on event and
+      -- the reliable one here (START_AUTOATTACK appears in no DLL on this
+      -- stack). Seed both clocks so dual-wield attribution has live timers
+      -- from the first swing instead of waiting for hits to trickle in.
       S.autoAttackActive = true
+      if event == "PLAYER_ENTER_COMBAT" then
+        ResetMH()
+        ResetOH()
+      end
 
-    elseif event == "STOP_AUTOATTACK" then
+    elseif event == "STOP_AUTOATTACK" or event == "PLAYER_LEAVE_COMBAT" then
       S.autoAttackActive = false
 
     elseif event == "UNIT_ATTACK_SPEED" then
