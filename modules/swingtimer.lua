@@ -304,6 +304,27 @@ pfUI:RegisterModule("swingtimer", function ()
     S.raSpeed = (rs and rs > 0) and rs or 0
   end
 
+  -- Haste changes mid-swing (Flurry proc/expiry, haste procs) rescale the
+  -- server's remaining swing time proportionally -- mirror that on the live
+  -- timers or the bar drifts against the true swing. Also heals the reset
+  -- race where AUTO_ATTACK_SELF is processed before the new speed reaches
+  -- UnitAttackSpeed: UNIT_ATTACK_SPEED follows within a frame and corrects
+  -- the freshly-armed bar.
+  local function RescaleTimers()
+    local oldMH, oldOH = S.mhSpeed, S.ohSpeed
+    UpdateWeaponSpeeds()
+    if S.mhActive and oldMH > 0 and S.mhSpeed > 0 and S.mhSpeed ~= oldMH then
+      local ratio = S.mhSpeed / oldMH
+      S.mhTimer    = S.mhTimer * ratio
+      S.mhTimerMax = S.mhTimerMax * ratio
+    end
+    if S.ohActive and oldOH > 0 and S.ohSpeed > 0 and S.ohSpeed ~= oldOH then
+      local ratio = S.ohSpeed / oldOH
+      S.ohTimer    = S.ohTimer * ratio
+      S.ohTimerMax = S.ohTimerMax * ratio
+    end
+  end
+
   -- Reset MH countdown to full speed (server confirmed swing)
   local function ResetMH()
     if S.mhFrozenAt then
@@ -820,6 +841,7 @@ pfUI:RegisterModule("swingtimer", function ()
   events:RegisterEvent("SPELL_QUEUE_EVENT")
   events:RegisterEvent("START_AUTOATTACK")
   events:RegisterEvent("STOP_AUTOATTACK")
+  events:RegisterEvent("UNIT_ATTACK_SPEED")
 
   events:SetScript("OnEvent", function()
     if event == "AUTO_ATTACK_SELF" then
@@ -834,19 +856,22 @@ pfUI:RegisterModule("swingtimer", function ()
         if not isOffhand and S.mhActive then return end
       end
 
-      -- Extra attack detection: if timer still has >20% remaining for that hand,
-      -- the server did NOT reset the swing clock -> this is an extra attack, skip.
-      -- Use 20% here (SP_SwingTimer's ShouldResetTimer threshold).
+      -- Extra attack detection: genuine extra attacks (Windfury, Reckoning,
+      -- Sword Spec, Hand of Justice) land almost immediately after a real
+      -- swing, while the bar still shows ~90%+ remaining -- those must not
+      -- reset the clock. Real swings under haste can land visibly early
+      -- against a stale bar (5/5 Flurry leaves ~23% showing if the rescale
+      -- event lags a frame), so only near-instant hits count as extras.
       -- Exception: if timer is already at 0 (expired), always accept.
       if isOffhand then
         local pct = S.ohActive and (S.ohTimer / S.ohTimerMax) or 0
-        if S.ohActive and S.ohTimer > 0 and pct > 0.20 then
+        if S.ohActive and S.ohTimer > 0 and pct > 0.75 then
           return
         end
         ResetOH()
       else
         local pct = S.mhActive and (S.mhTimer / S.mhTimerMax) or 0
-        if S.mhActive and S.mhTimer > 0 and pct > 0.20 then
+        if S.mhActive and S.mhTimer > 0 and pct > 0.75 then
           return
         end
         ResetMH()
@@ -897,6 +922,12 @@ pfUI:RegisterModule("swingtimer", function ()
 
     elseif event == "STOP_AUTOATTACK" then
       S.autoAttackActive = false
+
+    elseif event == "UNIT_ATTACK_SPEED" then
+      -- arg1 is a guid on this client (SuperWoW unit events)
+      if IsPlayerGuid(arg1) then
+        RescaleTimers()
+      end
 
     elseif event == "PLAYER_ENTERING_WORLD" then
       local class = UnitClassBase("player")
