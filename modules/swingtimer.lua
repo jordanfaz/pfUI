@@ -26,6 +26,7 @@ pfUI:RegisterModule("swingtimer", function ()
     isWarrior = false,
     isDruid = false,
     sawOffhandFlag = false,
+    mhLastSwingAt = 0, ohLastSwingAt = 0,
     cachedHSSlots = {}, cachedCleaveSlots = {}, cachedMaulSlots = {},
     useSpellQueueEvent = false,
     swingThrottle = 0,
@@ -803,8 +804,12 @@ pfUI:RegisterModule("swingtimer", function ()
     elseif IsOnSwingSpell(spellId) then
       -- On-next-swing ability (HS / Cleave / Maul / Raptor Strike / etc.)
       -- — the swing fires as the spell consumes it. Drop the queued color.
+      -- This IS the real swing, so it stamps the swing clock like an
+      -- accepted AUTO_ATTACK_SELF would — its event echoes must be eaten.
       S.hsQueued = false; S.cleaveQueued = false; S.maulQueued = false
+      S.mhLastSwingAt = GetTime()
       ResetMH()
+      if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: on-swing reset id="..tostring(spellId)) end
     else
       -- C_Spell.ResetsMeleeSwing mirrors the server rule (Turtle's
       -- Spell::IsMeleeAttackResetSpell): InterruptFlags has AUTOATTACK and
@@ -822,6 +827,7 @@ pfUI:RegisterModule("swingtimer", function ()
           S.ohTimerMax = S.ohSpeed
           S.ohTimer    = S.ohSpeed
         end
+        if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: spell swing-reset id="..tostring(spellId)) end
       elseif S.mhFrozenAt then
         local castDuration = GetTime() - S.mhFrozenAt
         S.mhTimer = S.mhTimer + castDuration
@@ -890,30 +896,38 @@ pfUI:RegisterModule("swingtimer", function ()
         end
       end
 
-      -- Extra attack detection: genuine extra attacks (Windfury, Reckoning,
-      -- Sword Spec, Hand of Justice) land almost immediately after a real
-      -- swing, while the bar still shows ~90%+ remaining -- those must not
-      -- reset the clock. Real swings under haste can land visibly early
-      -- against a stale bar (5/5 Flurry leaves ~23% showing if the rescale
-      -- event lags a frame), so only near-instant hits count as extras.
-      -- Exception: if timer is already at 0 (expired), always accept.
+      -- Extra attack detection, time-based. Genuine non-clock-advancing hits
+      -- (event echoes -- this stack fires AUTO_ATTACK_SELF 2-3x per swing --
+      -- and Windfury-class extra attacks) arrive within a fraction of a
+      -- period after the last REAL swing. A real swing arriving with a
+      -- nearly-full bar instead means something re-armed the bar wrongly
+      -- (a spell SPELL_GO classified as swing-resetting when the server
+      -- didn't actually reset, e.g. custom seal recasts) -- accept it so the
+      -- bar resyncs within one swing instead of eating hits indefinitely.
+      -- A fill-percent guard cannot tell those two apart; time since the
+      -- last accepted swing can.
       -- `/run pfSwingDebug=1` prints every decision this handler takes, with
       -- the armed duration -- the fastest way to see WHY a bar misbehaves on
       -- someone else's install (armed=base-speed while hasted, eaten swings).
+      local now = GetTime()
       if isOffhand then
         local pct = S.ohActive and (S.ohTimer / S.ohTimerMax) or 0
-        if S.ohActive and S.ohTimer > 0 and pct > 0.75 then
-          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: OH skip (extra) rem="..floor(pct*100).."%") end
+        if S.ohActive and S.ohTimer > 0 and pct > 0.75
+          and (now - S.ohLastSwingAt) < S.ohTimerMax * 0.5 then
+          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: OH skip (echo/extra) rem="..floor(pct*100).."%") end
           return
         end
+        S.ohLastSwingAt = now
         ResetOH()
         if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage(string.format("swt: OH reset armed=%.2f landed=%d%%", S.ohTimerMax, pct*100)) end
       else
         local pct = S.mhActive and (S.mhTimer / S.mhTimerMax) or 0
-        if S.mhActive and S.mhTimer > 0 and pct > 0.75 then
-          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: MH skip (extra) rem="..floor(pct*100).."%") end
+        if S.mhActive and S.mhTimer > 0 and pct > 0.75
+          and (now - S.mhLastSwingAt) < S.mhTimerMax * 0.5 then
+          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: MH skip (echo/extra) rem="..floor(pct*100).."%") end
           return
         end
+        S.mhLastSwingAt = now
         ResetMH()
         if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage(string.format("swt: MH reset armed=%.2f landed=%d%%", S.mhTimerMax, pct*100)) end
       end
@@ -967,6 +981,7 @@ pfUI:RegisterModule("swingtimer", function ()
       if event == "PLAYER_ENTER_COMBAT" then
         ResetMH()
         ResetOH()
+        if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: enter-combat seed") end
       end
 
     elseif event == "STOP_AUTOATTACK" or event == "PLAYER_LEAVE_COMBAT" then
