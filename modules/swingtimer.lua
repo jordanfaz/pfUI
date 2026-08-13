@@ -978,10 +978,18 @@ pfUI:RegisterModule("swingtimer", function ()
       -- stack). Seed both clocks so dual-wield attribution has live timers
       -- from the first swing instead of waiting for hits to trickle in.
       S.autoAttackActive = true
+      -- PLAYER_ENTER_COMBAT re-fires on EVERY attack command, not just the
+      -- off->on transition (macro spam = a flood of them), so seeding must
+      -- be a one-shot: only arm clocks that aren't already running, or every
+      -- press re-arms the bar and real swings land against a full bar.
       if event == "PLAYER_ENTER_COMBAT" then
-        ResetMH()
-        ResetOH()
-        if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: enter-combat seed") end
+        local seeded = false
+        if not S.mhActive then ResetMH() seeded = true end
+        if not S.ohActive then
+          ResetOH()
+          seeded = seeded or S.ohActive
+        end
+        if pfSwingDebug and seeded then DEFAULT_CHAT_FRAME:AddMessage("swt: enter-combat seed") end
       end
 
     elseif event == "STOP_AUTOATTACK" or event == "PLAYER_LEAVE_COMBAT" then
