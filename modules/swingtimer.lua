@@ -324,6 +324,9 @@ pfUI:RegisterModule("swingtimer", function ()
       S.ohTimer    = S.ohTimer * ratio
       S.ohTimerMax = S.ohTimerMax * ratio
     end
+    if pfSwingDebug and (S.mhSpeed ~= oldMH or S.ohSpeed ~= oldOH) then
+      DEFAULT_CHAT_FRAME:AddMessage(string.format("swt: rescale MH %.2f>%.2f OH %.2f>%.2f", oldMH, S.mhSpeed, oldOH, S.ohSpeed))
+    end
   end
 
   -- Reset MH countdown to full speed (server confirmed swing)
@@ -502,6 +505,15 @@ pfUI:RegisterModule("swingtimer", function ()
     if S.swingThrottle < swingDelay then return end
     local delta = S.swingThrottle
     S.swingThrottle = 0
+
+    -- Poll for attack-speed changes on the tick: UNIT_ATTACK_SPEED never
+    -- fires for the player on this client (probed 2026-08-13 -- Flurry
+    -- procced and expired without one player firing, while the same event
+    -- arrived for the target), and the field itself lags a packet behind
+    -- the swing at haste edges -- which is why Quartz hand-divides by 1.3
+    -- on fresh Flurry. Polling catches any haste source within one tick,
+    -- no spell names needed. No-ops while speeds are unchanged.
+    RescaleTimers()
 
     -- (out-of-combat hide handled naturally when timers expire)
 
@@ -885,18 +897,25 @@ pfUI:RegisterModule("swingtimer", function ()
       -- against a stale bar (5/5 Flurry leaves ~23% showing if the rescale
       -- event lags a frame), so only near-instant hits count as extras.
       -- Exception: if timer is already at 0 (expired), always accept.
+      -- `/run pfSwingDebug=1` prints every decision this handler takes, with
+      -- the armed duration -- the fastest way to see WHY a bar misbehaves on
+      -- someone else's install (armed=base-speed while hasted, eaten swings).
       if isOffhand then
         local pct = S.ohActive and (S.ohTimer / S.ohTimerMax) or 0
         if S.ohActive and S.ohTimer > 0 and pct > 0.75 then
+          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: OH skip (extra) rem="..floor(pct*100).."%") end
           return
         end
         ResetOH()
+        if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage(string.format("swt: OH reset armed=%.2f landed=%d%%", S.ohTimerMax, pct*100)) end
       else
         local pct = S.mhActive and (S.mhTimer / S.mhTimerMax) or 0
         if S.mhActive and S.mhTimer > 0 and pct > 0.75 then
+          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: MH skip (extra) rem="..floor(pct*100).."%") end
           return
         end
         ResetMH()
+        if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage(string.format("swt: MH reset armed=%.2f landed=%d%%", S.mhTimerMax, pct*100)) end
       end
 
     elseif event == "AUTO_ATTACK_OTHER" then
