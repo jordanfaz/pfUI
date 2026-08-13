@@ -1,7 +1,7 @@
 # Changes on top of brues-code/pfUI
 
 Everything on the `octo` branch that is not in
-[brues-code/pfUI](https://github.com/brues-code/pfUI) — **41 files, +784 / −160**,
+[brues-code/pfUI](https://github.com/brues-code/pfUI) — **42 files, +841 / −164**,
 measured against upstream `afdb6c38` (2026-08-13, after syncing his loothistory
 class-colours, 40-yard rangecheck default and click-to-macro binding).
 
@@ -33,6 +33,7 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 | `modules/cooldown.lua` | `if not parent then this:Hide() end` — no `return`, so it fell straight through to `parent:GetName()` on the nil it had just tested for. (`c5bc9599`) |
 | `modules/roll.lua` | An uncached item indexed `pfUI.roll.cache[nil]` → *table index is nil*. (`0f8406ff`) |
 | `modules/unitxp.lua` | The logout handler stops three indicators to avoid crash 132, but free-frame distance mode polls from **its own scanner frame**, which was never exposed or stopped. (`ed161fe3`) |
+| `api/api.lua` | Upstream `f9b0b598` switched swingtimer (parry haste, player-death bar reset), libdebuff (player-frame aura-refresh notify) and innervatecall (own-cast gate) to an `IsPlayerGuid()` helper **that nothing defines** — every one of those paths dies with *attempt to call a global 'IsPlayerGuid' (a nil value)* the moment it runs, silently under `scriptErrors=0`. Defined in the api; both sides canonicalised through `UnitGUID`. (`6b596133`) |
 
 ### Silently wrong behaviour
 | | |
@@ -44,6 +45,7 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 | `modules/socialmod.lua` | The friend-**offline** match was assigned unconditionally over the friend-**online** match, so coming online never recorded `lastseen`. (`ad927806`) |
 | `modules/roll.lua` | `strfind(LOOT_ROLL_ALL_PASSED, LOOT_ROLL_PASSED)` has no captures, so `everyone` was always nil and never reached the blacklist — "Everyone has passed on: X" was counted as a real roller. (`0f8406ff`) |
 | `modules/swingtimer.lua` | Off-hand detection accepted inventory type **21** (`INVTYPE_WEAPONMAINHAND`), which can never occupy the off-hand slot. Should be 22. (`9ab7f5f7`) |
+| `modules/swingtimer.lua` | The bar never tracked attack-speed changes — speed was read only when a swing reset the bar, and any hit landing with >20% remaining was discarded as an "extra attack". Under 5/5 Flurry the real swing lands with ~23% still showing, so the module ate legitimate swings, ran the bar to full and froze it there until the following swing ("the bar doesn't keep up"); lower Flurry ranks reset the bar visibly short of full instead. Now `UNIT_ATTACK_SPEED` rescales the live timers by newSpeed/oldSpeed — mirroring the server's proportional rescale of the remaining swing — and the extra-attack cutoff is 75% remaining, where only Windfury-class instant extras (~90%+) actually live. Reported by a warrior via Discord. (`17c679e4`) |
 | `modules/buffwatch.lua` | `fcache` is built once per config table and never invalidated, so ctrl/shift-clicking a skill onto the whitelist or blacklist did nothing until reload. (`f65f897c`) |
 | `modules/firstrun.lua` | Three chat-setup steps printed "Chat module is disabled" and then carried on into the nil `pfUI.chat` they had just tested for. (`1af427e3`) |
 | `libs/libpredict.lua` | ~~`UKNOWNBEING` / `UNKOWNBEING` — misspelled, so both resolve to nil.~~ **Wrong — reverted 2026-08-10.** `UKNOWNBEING` is Blizzard's own misspelling and *is* the real 1.12 global; `UNKNOWNBEING` does not exist. "Correcting" it turned two working guards into dead ones. `UNKOWNBEING` alone was the genuine typo. BigWigs' RosterLib and StatCompare both use `UKNOWNBEING` — the check I should have made. Merged upstream, then fixed by brues in `b6931359`. |
