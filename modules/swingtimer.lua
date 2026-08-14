@@ -315,17 +315,20 @@ pfUI:RegisterModule("swingtimer", function ()
   local function RescaleTimers()
     local oldMH, oldOH = S.mhSpeed, S.ohSpeed
     UpdateWeaponSpeeds()
-    if S.mhActive and oldMH > 0 and S.mhSpeed > 0 and S.mhSpeed ~= oldMH then
+    -- float-noise guard: UnitAttackSpeed jitters in far decimals
+    local mhChanged = S.mhSpeed > 0 and oldMH > 0 and abs(S.mhSpeed - oldMH) > 0.001
+    local ohChanged = S.ohSpeed > 0 and oldOH > 0 and abs(S.ohSpeed - oldOH) > 0.001
+    if S.mhActive and mhChanged then
       local ratio = S.mhSpeed / oldMH
       S.mhTimer    = S.mhTimer * ratio
       S.mhTimerMax = S.mhTimerMax * ratio
     end
-    if S.ohActive and oldOH > 0 and S.ohSpeed > 0 and S.ohSpeed ~= oldOH then
+    if S.ohActive and ohChanged then
       local ratio = S.ohSpeed / oldOH
       S.ohTimer    = S.ohTimer * ratio
       S.ohTimerMax = S.ohTimerMax * ratio
     end
-    if pfSwingDebug and (S.mhSpeed ~= oldMH or S.ohSpeed ~= oldOH) then
+    if pfSwingDebug and (mhChanged or ohChanged) then
       DEFAULT_CHAT_FRAME:AddMessage(string.format("swt: rescale MH %.2f>%.2f OH %.2f>%.2f", oldMH, S.mhSpeed, oldOH, S.ohSpeed))
     end
   end
@@ -818,16 +821,28 @@ pfUI:RegisterModule("swingtimer", function ()
       -- during-cast is a Slam-style cast — push the timer forward by the cast
       -- duration so the bar resumes from where it paused.
       if C_Spell.ResetsMeleeSwing(spellId) then
-        if S.mhActive and S.mhSpeed > 0 then
-          UpdateWeaponSpeeds()
-          S.mhTimerMax = S.mhSpeed
-          S.mhTimer    = S.mhSpeed
+        -- Chance-on-hit procs (Lightning Strike 16614 etc.) carry the
+        -- swing-reset DBC flags but are cast BY a swing that already
+        -- advanced the clock -- their SPELL_GO arrives glued to the
+        -- triggering hit, and on a dual-wielder every off-hand proc would
+        -- refill the mainhand bar mid-swing. A real player cast is never
+        -- that swing-adjacent, so skip re-arms right after any swing.
+        local last = S.mhLastSwingAt
+        if S.ohLastSwingAt > last then last = S.ohLastSwingAt end
+        if GetTime() - last < 0.3 then
+          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: swing-reset skipped (proc) id="..tostring(spellId)) end
+        else
+          if S.mhActive and S.mhSpeed > 0 then
+            UpdateWeaponSpeeds()
+            S.mhTimerMax = S.mhSpeed
+            S.mhTimer    = S.mhSpeed
+          end
+          if S.ohActive and S.ohSpeed > 0 then
+            S.ohTimerMax = S.ohSpeed
+            S.ohTimer    = S.ohSpeed
+          end
+          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: spell swing-reset id="..tostring(spellId)) end
         end
-        if S.ohActive and S.ohSpeed > 0 then
-          S.ohTimerMax = S.ohSpeed
-          S.ohTimer    = S.ohSpeed
-        end
-        if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: spell swing-reset id="..tostring(spellId)) end
       elseif S.mhFrozenAt then
         local castDuration = GetTime() - S.mhFrozenAt
         S.mhTimer = S.mhTimer + castDuration
