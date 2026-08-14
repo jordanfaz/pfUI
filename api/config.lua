@@ -226,9 +226,6 @@ function pfUI:LoadConfig()
   pfUI:UpdateConfig("unitframes", nil,           "always2dportrait", "0")
   pfUI:UpdateConfig("unitframes", nil,           "portraittexture",  "1")
   pfUI:UpdateConfig("unitframes", nil,           "layout",           "default")
-  -- upstream flipped this default to "1" (af6893c1); kept "0" here because
-  -- pfUI only saves values that differ from defaults, so a default flip
-  -- silently enables the fade for everyone who had it "off" (Roby included)
   pfUI:UpdateConfig("unitframes", nil,           "rangecheck",       "0")
   pfUI:UpdateConfig("unitframes", nil,           "rangecheck_mode",  "vanilla")
   pfUI:UpdateConfig("unitframes", nil,           "rangecheck_distance", "40")

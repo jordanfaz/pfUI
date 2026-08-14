@@ -206,11 +206,15 @@ end
 
 -- [ IsPlayerGuid ]
 -- Returns whether a GUID or unit token refers to the local player.
--- Both sides go through UnitGUID so SuperWoW event guids, unit tokens
--- and differently-cased hex strings all compare canonically.
+-- Uses the native IsPlayerGuid when a DLL provides one; no DLL on this
+-- stack exports it (probed 2026-08-13: not in nampower's registration
+-- log, not in any DLL's strings, not registered by ClassicAPI source up
+-- to v1.9.11), so the fallback canonicalises both sides through UnitGUID
+-- -- SuperWoW event guids, unit tokens and differently-cased hex strings
+-- all compare equal.
 -- guid         [string]        A unit GUID (or unitID) to test.
 -- return:      [bool]          true if it is the player, otherwise "nil"
-function pfUI.api.IsPlayerGuid(guid)
+pfUI.api.IsPlayerGuid = _G.IsPlayerGuid or function(guid)
   if not guid then return nil end
   local pguid = UnitGUID("player")
   return pguid and UnitGUID(guid) == pguid or nil
