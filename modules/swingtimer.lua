@@ -27,6 +27,7 @@ pfUI:RegisterModule("swingtimer", function ()
     isDruid = false,
     sawOffhandFlag = false,
     mhLastSwingAt = 0, ohLastSwingAt = 0,
+    procSpells = {}, lastSpellResetId = nil, lastSpellResetAt = nil,
     cachedHSSlots = {}, cachedCleaveSlots = {}, cachedMaulSlots = {},
     useSpellQueueEvent = false,
     swingThrottle = 0,
@@ -823,25 +824,37 @@ pfUI:RegisterModule("swingtimer", function ()
       if C_Spell.ResetsMeleeSwing(spellId) then
         -- Chance-on-hit procs (Lightning Strike 16614 etc.) carry the
         -- swing-reset DBC flags but are cast BY a swing that already
-        -- advanced the clock -- their SPELL_GO arrives glued to the
-        -- triggering hit, and on a dual-wielder every off-hand proc would
-        -- refill the mainhand bar mid-swing. A real player cast is never
-        -- that swing-adjacent, so skip re-arms right after any swing.
-        local last = S.mhLastSwingAt
-        if S.ohLastSwingAt > last then last = S.ohLastSwingAt end
-        if GetTime() - last < 0.3 then
+        -- advanced the clock -- on a dual-wielder every off-hand proc would
+        -- refill the mainhand bar mid-swing. Their SPELL_GO precedes the
+        -- triggering AUTO_ATTACK event here, so adjacency can't be tested
+        -- at this point; instead the accept path LEARNS them: if the next
+        -- swing lands on the old schedule (full bar right after this
+        -- re-arm), the spell provably didn't reset the server clock and its
+        -- id is blacklisted for the session. Swing-adjacent SPELL_GOs
+        -- (other event order) learn immediately.
+        local now = GetTime()
+        if S.procSpells[spellId] then
           if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: swing-reset skipped (proc) id="..tostring(spellId)) end
         else
-          if S.mhActive and S.mhSpeed > 0 then
-            UpdateWeaponSpeeds()
-            S.mhTimerMax = S.mhSpeed
-            S.mhTimer    = S.mhSpeed
+          local last = S.mhLastSwingAt
+          if S.ohLastSwingAt > last then last = S.ohLastSwingAt end
+          if now - last < 0.3 then
+            S.procSpells[spellId] = true
+            if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: learned proc id="..tostring(spellId).." (swing-adjacent)") end
+          else
+            if S.mhActive and S.mhSpeed > 0 then
+              UpdateWeaponSpeeds()
+              S.mhTimerMax = S.mhSpeed
+              S.mhTimer    = S.mhSpeed
+            end
+            if S.ohActive and S.ohSpeed > 0 then
+              S.ohTimerMax = S.ohSpeed
+              S.ohTimer    = S.ohSpeed
+            end
+            S.lastSpellResetId = spellId
+            S.lastSpellResetAt = now
+            if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: spell swing-reset id="..tostring(spellId)) end
           end
-          if S.ohActive and S.ohSpeed > 0 then
-            S.ohTimerMax = S.ohSpeed
-            S.ohTimer    = S.ohSpeed
-          end
-          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: spell swing-reset id="..tostring(spellId)) end
         end
       elseif S.mhFrozenAt then
         local castDuration = GetTime() - S.mhFrozenAt
@@ -932,6 +945,11 @@ pfUI:RegisterModule("swingtimer", function ()
           if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: OH skip (echo/extra) rem="..floor(pct*100).."%") end
           return
         end
+        if S.lastSpellResetAt and pct > 0.75 and (now - S.lastSpellResetAt) < 0.4 then
+          S.procSpells[S.lastSpellResetId] = true
+          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: learned proc id="..tostring(S.lastSpellResetId)) end
+          S.lastSpellResetAt = nil
+        end
         S.ohLastSwingAt = now
         ResetOH()
         if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage(string.format("swt: OH reset armed=%.2f landed=%d%%", S.ohTimerMax, pct*100)) end
@@ -941,6 +959,11 @@ pfUI:RegisterModule("swingtimer", function ()
           and (now - S.mhLastSwingAt) < S.mhTimerMax * 0.5 then
           if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: MH skip (echo/extra) rem="..floor(pct*100).."%") end
           return
+        end
+        if S.lastSpellResetAt and pct > 0.75 and (now - S.lastSpellResetAt) < 0.4 then
+          S.procSpells[S.lastSpellResetId] = true
+          if pfSwingDebug then DEFAULT_CHAT_FRAME:AddMessage("swt: learned proc id="..tostring(S.lastSpellResetId)) end
+          S.lastSpellResetAt = nil
         end
         S.mhLastSwingAt = now
         ResetMH()
