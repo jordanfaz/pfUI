@@ -1,9 +1,10 @@
 # Changes on top of brues-code/pfUI
 
 Everything on the `octo` branch that is not in
-[brues-code/pfUI](https://github.com/brues-code/pfUI) — **42 files, +841 / −164**,
-measured against upstream `afdb6c38` (2026-08-13, after syncing his loothistory
-class-colours, 40-yard rangecheck default and click-to-macro binding).
+[brues-code/pfUI](https://github.com/brues-code/pfUI) — **42 files, +949 / −169**,
+measured against upstream `d75e2802` (2026-08-14 sync: his IsPlayerGuid wrapper,
+rangecheck-default revert, raidpet party pets, loothistory class colours,
+click-to-named-macro binding).
 
 The delta shrank rather than grew: most of section 1 has been merged upstream (PRs
 [#39](https://github.com/brues-code/pfUI/pull/39) and
@@ -33,7 +34,7 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 | `modules/cooldown.lua` | `if not parent then this:Hide() end` — no `return`, so it fell straight through to `parent:GetName()` on the nil it had just tested for. (`c5bc9599`) |
 | `modules/roll.lua` | An uncached item indexed `pfUI.roll.cache[nil]` → *table index is nil*. (`0f8406ff`) |
 | `modules/unitxp.lua` | The logout handler stops three indicators to avoid crash 132, but free-frame distance mode polls from **its own scanner frame**, which was never exposed or stopped. (`ed161fe3`) |
-| `api/api.lua` | Upstream `f9b0b598` switched swingtimer (parry haste, player-death bar reset), libdebuff (player-frame aura-refresh notify) and innervatecall (own-cast gate) to an `IsPlayerGuid()` helper **that nothing defines** — every one of those paths dies with *attempt to call a global 'IsPlayerGuid' (a nil value)* the moment it runs, silently under `scriptErrors=0`. Defined in the api; both sides canonicalised through `UnitGUID`. (`6b596133`) |
+| `api/api.lua` | Upstream `f9b0b598` switched swingtimer (parry haste, player-death bar reset), libdebuff (player-frame aura-refresh notify) and innervatecall (own-cast gate) to an `IsPlayerGuid()` helper **that nothing defines** — every one of those paths dies with *attempt to call a global 'IsPlayerGuid' (a nil value)* the moment it runs, silently under `scriptErrors=0`. Defined in the api; both sides canonicalised through `UnitGUID`. (`6b596133`) **Upstream's own fix a day later (`f8dde49f`) is `pfUI.api.IsPlayerGuid = _G.IsPlayerGuid` — but no DLL on this stack exports a native `IsPlayerGuid` (probed: nampower registration log, DLL strings, ClassicAPI source through v1.9.11), so that wrapper assigns nil and the call sites stay broken upstream.** Reconciled at the 08-14 sync: native-when-present `or` our fallback. |
 
 ### Silently wrong behaviour
 | | |
