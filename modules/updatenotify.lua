@@ -10,9 +10,10 @@ pfUI:RegisterModule("updatenotify", function ()
   -- release that does not exist. The toc version is free to say anything;
   -- this constant only moves when the merged upstream RELEASE changes --
   -- commit-level syncs do not move it (v9.0.18 was still latest at the
-  -- 2026-08-11 sync). Encoded major*10000 + minor*100 + fix. (Same pattern
-  -- as OWThreat's compatVer.)
-  local localversion  = 90018 -- brues-code/pfUI v9.0.18
+  -- 2026-08-11 sync; v9.0.19's tag commit 74fbbb61 came in with the
+  -- 2026-08-14 merge). Encoded major*10000 + minor*100 + fix. (Same
+  -- pattern as OWThreat's compatVer.)
+  local localversion  = 90019 -- brues-code/pfUI v9.0.19
   local remoteversion = tonumber(pfUI_init.updateavailable) or 0
   local loginchannels = { "BATTLEGROUND", "RAID", "GUILD" }
   local groupchannels = { "BATTLEGROUND", "RAID" }
