@@ -1,10 +1,11 @@
 # Changes on top of brues-code/pfUI
 
 Everything on the `octo` branch that is not in
-[brues-code/pfUI](https://github.com/brues-code/pfUI) — **43 files, +1048 / −196**,
-measured against upstream `d75e2802` (2026-08-14 sync: his IsPlayerGuid wrapper,
-rangecheck-default revert, raidpet party pets, loothistory class colours,
-click-to-named-macro binding).
+[brues-code/pfUI](https://github.com/brues-code/pfUI) — **43 files, +1049 / −195**,
+measured against upstream `8cdaf1fc` (2026-08-21 sync: tooltip aura-caster class
+colours, localized race info, GetCoinTextureString in CreateGoldString). Upstream's
+`685ecb4a`, which drops the `!!!ClassicAPI` toc dependency, is deliberately **not**
+taken — see below.
 
 The delta shrank rather than grew: most of section 1 has been merged upstream (PRs
 [#39](https://github.com/brues-code/pfUI/pull/39) and
@@ -67,6 +68,7 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 | | |
 |---|---|
 | `unitframes.rangecheck` | ~~Upstream flipped the 40-yard range fade to on-by-default (`af6893c1`); kept **off** here.~~ **Moot since 2026-08-14** — upstream reverted the flip itself (`9eb34b8f`), both trees default to off again; zero delta on this line. Kept as a record of the default-flip trap (pfUI only saves diffs-from-defaults, so default flips silently change "off" users). |
+| `pfUI.toc` `## Dependencies` | Upstream `685ecb4a` removed `## Dependencies: !!!ClassicAPI`. Kept here. ClassicAPI 1.10.1 ships as a DLL that registers `!!!ClassicAPI` as an always-on synthetic addon, and the dependency **does** resolve against it — verified in game with no such folder on disk. So the line costs nothing and still buys the clean disable if the DLL is ever missing. Worth recording that git considers `685ecb4a` merged (the merge commit survives in history) while its content does not apply, so a plain `git merge upstream/master` reports "already up to date" and will not reintroduce it. |
 
 ## 2. Performance
 
