@@ -9,7 +9,7 @@ a risk: ClassicAPI 1.10.1 ships as a DLL that embeds `AddOns/!!!ClassicAPI/` and
 registers it as an always-on synthetic addon at startup, so there is no on-disk folder
 for a `## Dependencies` line to resolve against. Confirmed in the shipped binary —
 `CreateColor`, `ColorMixin`, `GetRGBA` and `Util\Color.lua` are all embedded in
-`ClassicAPI.dll`, which is listed in `dlls.txt` under VanillaFixes. The count is
+`ClassicAPI.dll`, which is listed in `dlls.txt` under VanillaFixes — and verified at runtime 2026-08-21 with the on-disk folder deleted: clean load with no errors, and `CreateColor`, `ColorMixin`, `Mixin`, `C_CreatureInfo`, `GetCoinTextureString` and `GetPlayerInfoByGUID` all resolving. The sync's own additions check out on the same pass: the `C_CreatureInfo` race loop terminates and populates (10 entries, `Human` → Human/Alliance), and `GetCoinTextureString` money renders as coin textures in FontStrings, though the escapes print literally in the chat frame. The count is
 unchanged across that sync: all four upstream commits were taken wholesale, so the
 merge added no divergence.
 
