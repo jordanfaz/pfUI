@@ -4,8 +4,12 @@ Everything on the `octo` branch that is not in
 [brues-code/pfUI](https://github.com/brues-code/pfUI) — **43 files, +1047 / −195**,
 measured against upstream `685ecb4a` (2026-08-21 sync: tooltip aura-caster class
 colours, localized race info, GetCoinTextureString in CreateGoldString, and the
-`!!!ClassicAPI` toc dependency dropped — load order now rests on the folder prefix
-alone, which costs the clean disable when ClassicAPI is absent). The count is
+`!!!ClassicAPI` toc dependency dropped). That last one is correct on this stack, not
+a risk: ClassicAPI 1.10.1 ships as a DLL that embeds `AddOns/!!!ClassicAPI/` and
+registers it as an always-on synthetic addon at startup, so there is no on-disk folder
+for a `## Dependencies` line to resolve against. Confirmed in the shipped binary —
+`CreateColor`, `ColorMixin`, `GetRGBA` and `Util\Color.lua` are all embedded in
+`ClassicAPI.dll`, which is listed in `dlls.txt` under VanillaFixes. The count is
 unchanged across that sync: all four upstream commits were taken wholesale, so the
 merge added no divergence.
 
