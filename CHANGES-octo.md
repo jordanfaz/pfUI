@@ -2,9 +2,12 @@
 
 Everything on the `octo` branch that is not in
 [brues-code/pfUI](https://github.com/brues-code/pfUI) — **43 files, +1047 / −195**,
-measured against upstream `d75e2802` (2026-08-14 sync: his IsPlayerGuid wrapper,
-rangecheck-default revert, raidpet party pets, loothistory class colours,
-click-to-named-macro binding).
+measured against upstream `685ecb4a` (2026-08-21 sync: tooltip aura-caster class
+colours, localized race info, GetCoinTextureString in CreateGoldString, and the
+`!!!ClassicAPI` toc dependency dropped — load order now rests on the folder prefix
+alone, which costs the clean disable when ClassicAPI is absent). The count is
+unchanged across that sync: all four upstream commits were taken wholesale, so the
+merge added no divergence.
 
 The delta shrank rather than grew: most of section 1 has been merged upstream (PRs
 [#39](https://github.com/brues-code/pfUI/pull/39) and
