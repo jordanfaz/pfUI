@@ -299,26 +299,6 @@ function pfUI:GetEnvironment()
   pfUI.env.pfUI_throttle = _G.pfUI_throttle
   pfUI.env.L = (pfUI_locale[GetLocale()] or pfUI_locale["enUS"])
   pfUI.env.L["class"] = pfUI.env.L["class"] or tInvert(LOCALIZED_CLASS_NAMES_MALE)
-  -- Guarded. This runs inside GetEnvironment(), which every module calls to build
-  -- its environment, so anything that throws here takes the module down with it.
-  -- Upstream assumes C_CreatureInfo exists, that GetRaceInfo eventually returns
-  -- nil, and that GetFactionInfo never does - three assumptions about a
-  -- DLL-provided API, made in the one function the whole addon depends on.
-  if not pfUI.env.L["race"] and C_CreatureInfo and C_CreatureInfo.GetRaceInfo then
-      pfUI.env.L["race"] = {}
-      local i = 1
-      local ok, raceInfo = pcall(C_CreatureInfo.GetRaceInfo, i)
-      while ok and raceInfo and raceInfo.clientFileString and i <= 100 do
-          local okfac, fac = pcall(C_CreatureInfo.GetFactionInfo, i)
-          pfUI.env.L["race"][raceInfo.clientFileString] = {
-              raceName = raceInfo.raceName,
-              raceID = raceInfo.raceID,
-              faction = okfac and fac and fac.groupTag or nil,
-          }
-          i = i + 1
-          ok, raceInfo = pcall(C_CreatureInfo.GetRaceInfo, i)
-      end
-   end
 
   return pfUI.env
 end
