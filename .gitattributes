@@ -1,0 +1,15 @@
+# Line endings are frozen as committed, deliberately.
+#
+# This tree is mixed: modules/nameplates.lua is stored CRLF, CHANGES-octo.md is
+# stored LF, and that is inherited from upstream rather than chosen. Without this
+# file git converts on checkout, so the working copy stops matching the blob and
+# an ordinary edit can come back as a whole-file diff instead of the three lines
+# you changed -- which is exactly what happened while editing CHANGES-octo.md.
+#
+# "-text" disables end-of-line conversion entirely: checkout gives back the bytes
+# that were committed, and commits store the bytes on disk. Nothing renormalises.
+#
+# The alternative, "* text=auto eol=lf", is tidier in the abstract but would
+# rewrite every file in one commit. This fork merges from brues-code/pfUI
+# regularly, and a mass renormalisation would collide with every future sync.
+* -text
