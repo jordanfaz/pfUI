@@ -1,11 +1,16 @@
 # Changes on top of brues-code/pfUI
 
 Everything on the `octo` branch that is not in
-[brues-code/pfUI](https://github.com/brues-code/pfUI) — **43 files, +1049 / −195**,
-measured against upstream `8cdaf1fc` (2026-08-21 sync: tooltip aura-caster class
-colours, localized race info, GetCoinTextureString in CreateGoldString). Upstream's
+[brues-code/pfUI](https://github.com/brues-code/pfUI) — **43 files, +989 / −169**,
+measured against upstream `82c74c2d` (2026-08-21 sync: tooltip aura-caster class colours,
+localized race info, GetCoinTextureString in CreateGoldString, the `handlesHookScript`
+capability flag, and skipping the `pfSellData` declaration on turtle clients). Upstream's
 `685ecb4a`, which drops the `!!!ClassicAPI` toc dependency, is deliberately **not**
 taken — see below.
+
+**The delta shrank by 65 lines at this sync because brues merged the nameplate colour work
+upstream** (`fe5b3b13`, `a7ad1f07`, `a3cfd711`). Those three fixes are no longer divergence;
+they are simply pfUI now, for every user of the ClassicAPI edition. Reported by Iden.
 
 The delta shrank rather than grew: most of section 1 has been merged upstream (PRs
 [#39](https://github.com/brues-code/pfUI/pull/39) and
