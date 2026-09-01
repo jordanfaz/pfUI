@@ -52,7 +52,7 @@ pfUI:RegisterModule("updatenotify", function ()
 
     if event == "PLAYER_ENTERING_WORLD" then
       if not alreadyshown and localversion < remoteversion then
-        DEFAULT_CHAT_FRAME:AddMessage(string.format(T["|cff33ffccpf|rUI: New version available! Get it at %s"], GetAddOnMetadata(pfUI.name, "X-Website") .. "/releases"))
+        DEFAULT_CHAT_FRAME:AddMessage(string.format(T["|cff33ffccpf|rUI: New version available! Get it at %s"], (GetAddOnMetadata(pfUI.name, "X-Website") or "") .. "/releases"))
         DEFAULT_CHAT_FRAME:AddMessage(T["|cffddddddIt's always safe to upgrade |cff33ffccpf|rUI. |cffddddddYou won't lose any of your configuration."])
         pfUI_init.updateavailable = localversion
         alreadyshown = true
