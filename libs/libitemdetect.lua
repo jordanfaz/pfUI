@@ -36,6 +36,14 @@ if pfUI.api.libitemdetect then return end
 					category = "Junk"
 					elseif toolItems[itemID] then
 						category = "Tools"
+					elseif (classID == ItemClass.Weapon or itemType == "Weapon") and
+						(string.find(string.lower(name or ""), "fishing pole", 1, true) or
+						string.find(string.lower(name or ""), "mining pick", 1, true) or
+						string.find(string.lower(name or ""), "skinning knife", 1, true)) then
+						-- Gathering/utility weapons (fishing poles, mining picks, skinning
+						-- knives) are classified as Weapon by classID/itemType, so they need
+						-- to be caught here before the generic Weapon branch below.
+						category = "Tools"
 						elseif equipSlot == "INVTYPE_TRINKET" then
 							category = "Trinket"
 							elseif classID == ItemClass.Questitem or itemType == "Quest" then
