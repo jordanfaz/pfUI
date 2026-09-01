@@ -773,6 +773,9 @@ local light = {
     ["shagudps"] = {
       ["skin"] = "1",
     },
+    ["combatledger"] = {
+      ["dock"] = "1",
+    },
   },
   ["nameplates"] = {
     ["combatofftank"] = "0.5,0,0.7,1",
