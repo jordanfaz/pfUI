@@ -812,10 +812,16 @@ for _, line in pairs(text) do
                                                                                                                                       end
                                                                                                                                       for _, bag in ipairs(iterate) do
                                                                                                                                         local slots = pfUI.bags[bag] and pfUI.bags[bag].slots
+                                                                                                                                        local bagsize = GetBagSize(bag)
                                                                                                                                         if slots then
-                                                                                                                                          for _, entry in pairs(slots) do
+                                                                                                                                          for slotIndex, entry in pairs(slots) do
                                                                                                                                             if entry.frame then
-                                                                                                                                              entry.frame:Show()
+                                                                                                                                              -- keyring slots stay hidden here too, otherwise this undoes the toggle
+                                                                                                                                              if slotIndex <= bagsize then
+                                                                                                                                                entry.frame:Show()
+                                                                                                                                              else
+                                                                                                                                                entry.frame:Hide()
+                                                                                                                                              end
                                                                                                                                               if entry.frame.emptyCount then entry.frame.emptyCount:Hide() end
                                                                                                                                                 end
                                                                                                                                                 end
