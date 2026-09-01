@@ -18,6 +18,14 @@ for _, line in pairs(text) do
   return strlower(result)
   end
 
+  -- the keyring only has slots to iterate/show while the player has toggled it on
+  local function GetBagSize(bag)
+  if bag == -2 then
+    return pfUI.bag.showKeyring == true and GetKeyRingSize() or 0
+    end
+    return GetContainerNumSlots(bag)
+    end
+
   local function BagSortOpts()
   return {
     reverse     = C.appearance.bags.sortreverse == "1",
@@ -670,8 +678,7 @@ for _, line in pairs(text) do
                                                                         local groups = {}
                                                                         for _, category in ipairs(categories) do groups[category.name] = {} end
                                                                           for _, bag in ipairs(iterate) do
-                                                                            local size = GetContainerNumSlots(bag)
-                                                                            if bag == -2 and pfUI.bag.showKeyring == true then size = GetKeyRingSize() end
+                                                                            local size = GetBagSize(bag)
                                                                               for slot = 1, size do
                                                                                 local entry = pfUI.bags[bag] and pfUI.bags[bag].slots[slot]
                                                                                 if entry and entry.frame then
@@ -1003,8 +1010,7 @@ for _, line in pairs(text) do
                                                                                                                                                                 local maxslots = 0
 
                                                                                                                                                                 for bag = -2,11 do
-                                                                                                                                                                  local bagsize = GetContainerNumSlots(bag)
-                                                                                                                                                                  if bag == -2 and pfUI.bag.showKeyring == true then bagsize = GetKeyRingSize() end
+                                                                                                                                                                  local bagsize = GetBagSize(bag)
 
                                                                                                                                                                     maxslots = maxslots + bagsize
                                                                                                                                                                     end
@@ -1013,8 +1019,7 @@ for _, line in pairs(text) do
                                                                                                                                                                       for bag = -2,11 do
                                                                                                                                                                         if pfUI.bags[bag] then
                                                                                                                                                                           for slot, f in ipairs(pfUI.bags[bag].slots) do
-                                                                                                                                                                            local bagsize = GetContainerNumSlots(bag)
-                                                                                                                                                                            if bag == -2 and pfUI.bag.showKeyring == true then bagsize = GetKeyRingSize() end
+                                                                                                                                                                            local bagsize = GetBagSize(bag)
 
                                                                                                                                                                               if slot > bagsize then
                                                                                                                                                                                 pfUI.bags[bag].slots[slot].frame:Hide()
@@ -1155,8 +1160,7 @@ for _, line in pairs(text) do
                                                                                                                                                                                                                                       pfUI.bags[bag].slots = {}
                                                                                                                                                                                                                                       end
                                                                                                                                                                                                                                       pfUI.bags[bag]:SetID(bag)
-                                                                                                                                                                                                                                      local bagsize = GetContainerNumSlots(bag)
-                                                                                                                                                                                                                                      if bag == -2 and pfUI.bag.showKeyring == true then bagsize = GetKeyRingSize() end
+                                                                                                                                                                                                                                      local bagsize = GetBagSize(bag)
                                                                                                                                                                                                                                         for slot=1, bagsize do
                                                                                                                                                                                                                                           pfUI.bag:UpdateSlot(bag, slot)
 
@@ -1221,14 +1225,13 @@ for _, line in pairs(text) do
                                                                                                                                                                                                                                                         end
 
                                                                                                                                                                                                                                                         function pfUI.bag:UpdateBag(bag)
-                                                                                                                                                                                                                                                        local bagsize = GetContainerNumSlots(bag)
-                                                                                                                                                                                                                                                        if bag == -2 and pfUI.bag.showKeyring == true then bagsize = GetKeyRingSize() end
-                                                                                                                                                                                                                                                          for slot=1, bagsize do
-                                                                                                                                                                                                                                                            pfUI.bag:UpdateSlot(bag, slot)
-                                                                                                                                                                                                                                                            end
-                                                                                                                                                                                                                                                            end
+                                                                                                                                                                        local bagsize = GetBagSize(bag)
+                                                                                                                                                                          for slot=1, bagsize do
+                                                                                                                                                                            pfUI.bag:UpdateSlot(bag, slot)
+                                                                                                                                                                            end
+                                                                                                                                                                            end
 
-                                                                                                                                                                                                                                                            function pfUI.bag:UpdateSlot(bag, slot)
+                                                                                                                                                                            function pfUI.bag:UpdateSlot(bag, slot)
                                                                                                                                                                                                                                                             if not pfUI.bags[bag] then return end
 
                                                                                                                                                                                                                                                               if not pfUI.bags[bag].slots[slot] then
@@ -1611,8 +1614,7 @@ for _, line in pairs(text) do
                                                                                                                                                                                                                                                                 function pfUI.bag:UpdateCooldowns()
                                                                                                                                                                                                                                                                 local frame
                                                                                                                                                                                                                                                                 for bag=-2, 11 do
-                                                                                                                                                                                                                                                                local bagsize = GetContainerNumSlots(bag)
-                                                                                                                                                                                                                                                                if bag == -2 and pfUI.bag.showKeyring == true then bagsize = GetKeyRingSize() end
+                                                                                                                                                                                                                                                                local bagsize = GetBagSize(bag)
                                                                                                                                                                                                                                                                 for slot=1, bagsize do
                                                                                                                                                                                                                                                                 frame = pfUI.bags[bag] and pfUI.bags[bag].slots[slot] and pfUI.bags[bag].slots[slot].frame
                                                                                                                                                                                                                                                                 if frame and frame.hasItem and _G[frame:GetName() .. "Cooldown"] then
@@ -1624,8 +1626,7 @@ for _, line in pairs(text) do
 
                                                                                                                                                                                                                                                                 function pfUI.bag:UpdateItemLock()
                                                                                                                                                                                                                                                                 for bag=-2, 11 do
-                                                                                                                                                                                                                                                                local bagsize = GetContainerNumSlots(bag)
-                                                                                                                                                                                                                                                                if bag == -2 and pfUI.bag.showKeyring == true then bagsize = GetKeyRingSize() end
+                                                                                                                                                                                                                                                                local bagsize = GetBagSize(bag)
                                                                                                                                                                                                                                                                 for slot=1, bagsize do
                                                                                                                                                                                                                                                                 if pfUI.bags[bag] and pfUI.bags[bag].slots[slot] and pfUI.bags[bag].slots[slot].frame:IsShown() then
                                                                                                                                                                                                                                                                 local _, _, locked, _ = GetContainerItemInfo(bag, slot)
