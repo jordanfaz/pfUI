@@ -153,7 +153,7 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
   2026-08-14 when the release appeared) independently of the toc, the same shielding
   OWThreat's `compatVer` does. **Maintenance rule: bump the constant when an upstream
   RELEASE lands, not on commit-level syncs.**
-- **[OWThreat](https://github.com/roby-brok/OWThreat) docks and skins like TWThreat.** The
+- **OWThreat docks and skins like TWThreat.** The
   stock integration hooks the addon name `TWThreat` and the `TWT*` globals, so the renamed
   fork (`OWTMain`, `OWT_CONFIG`) never docked into the right chat panel. A parallel hook
   now registers it with the same meters dock, driven by the same `twt` config keys — the
