@@ -168,21 +168,8 @@ pfUI.libdebuff_spell_start_self_hooks["libpredict"] = function(spellId, casterGu
     return
   end
 
-  -- ClassicAPI's attribute-driven click-casting (SetAttribute "spell" on unit
-  -- frames) casts inside the DLL, so the CastSpell/CastSpellByName hooks that
-  -- fill spell_queue never run -- the gate below then skips the announce and
-  -- the heal is invisible to HealComm while QuickHeal's own announcer works
-  -- (reported 2026-08-14). This event is server truth and carries the spellId,
-  -- so rebuild the queue entry from it when the hooks were bypassed.
-  if spell_queue[1] ~= spellName then
-    local rank = C_Spell.GetSpellSubtext(spellId)
-    local fullName = spellName .. (rank or "")
-    if cache[fullName] then
-      spell_queue[1] = spellName
-      spell_queue[2] = fullName
-      spell_queue[3] = target or player
-    end
-  end
+  spell_queue[1] = spellName
+  spell_queue[2] = spellName .. (C_Spell.GetSpellSubtext(spellId) or "")
 
   if spell_queue[1] == spellName and cache[spell_queue[2]] then
     local amount   = cache[spell_queue[2]][1]

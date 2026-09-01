@@ -1101,7 +1101,13 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
     if plate.cache.player == nil and unitstr then
       plate.cache.player = UnitIsPlayer(unitstr) and true or false
     end
-    local class, ulevel, elite, player, guild = GetUnitInfo(name, true, plate.cache.player)
+    if plate.cache.minion == nil and unitstr then
+      plate.cache.minion = UnitIsMinion(unitstr) and true or false
+    end
+    local class, ulevel, elite, player, guild
+    if not plate.cache.minion then
+      class, ulevel, elite, player, guild = GetUnitInfo(name, true, plate.cache.player)
+    end
     if plate.cache.player ~= nil then player = plate.cache.player or nil end
 
     -- Use database level ONLY if current level is ?? (fixes ?? after reload, but doesn't override visible levels)
@@ -1121,7 +1127,7 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
     if player and unittype == "ENEMY_NPC" then unittype = "ENEMY_PLAYER" end
     if player and unittype == "FRIENDLY_NPC" then unittype = "FRIENDLY_PLAYER" end
     elite = plate.original.levelicon:IsShown() and not player and "boss" or elite
-    if not class then plate.wait_for_scan = true end
+    if not class and not plate.cache.minion then plate.wait_for_scan = true end
 
     -- skip data updates on invisible frames
     if not visible then return end
@@ -1207,7 +1213,7 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
     if plate.cache.level ~= level or plate.cache.elite ~= elite then
       plate.cache.level = level
       plate.cache.elite = elite
-      plate.level:SetText(string.format("%s%s", level, (elitestrings[elite] or "")))
+      plate.level:SetFormattedText("%s%s", level, (elitestrings[elite] or ""))
     end
 
     -- Set level color from GetDifficultyColor when using DB level.
@@ -1268,21 +1274,21 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
       local hasdata = ( rhp and rhpmax ) or estimated or hpmax > 100 or (round(hpmax/100*hp) ~= hp)
 
       if setting == "curperc" and hasdata and rhp then
-        plate.health.text:SetText(string.format("%s | %s%%", Abbreviate(rhp), ceil(hp/hpmax*100)))
+        plate.health.text:SetFormattedText("%s | %s%%", Abbreviate(rhp), ceil(hp/hpmax*100))
       elseif setting == "cur" and hasdata and rhp then
-        plate.health.text:SetText(string.format("%s", Abbreviate(rhp)))
+        plate.health.text:SetFormattedText("%s", Abbreviate(rhp))
       elseif setting == "curmax" and hasdata and rhp then
-        plate.health.text:SetText(string.format("%s - %s", Abbreviate(rhp), Abbreviate(rhpmax)))
+        plate.health.text:SetFormattedText("%s - %s", Abbreviate(rhp), Abbreviate(rhpmax))
       elseif setting == "curmaxs" and hasdata and rhp then
-        plate.health.text:SetText(string.format("%s / %s", Abbreviate(rhp), Abbreviate(rhpmax)))
+        plate.health.text:SetFormattedText("%s / %s", Abbreviate(rhp), Abbreviate(rhpmax))
       elseif setting == "curmaxperc" and hasdata and rhp then
-        plate.health.text:SetText(string.format("%s - %s | %s%%", Abbreviate(rhp), Abbreviate(rhpmax), ceil(hp/hpmax*100)))
+        plate.health.text:SetFormattedText("%s - %s | %s%%", Abbreviate(rhp), Abbreviate(rhpmax), ceil(hp/hpmax*100))
       elseif setting == "curmaxpercs" and hasdata and rhp then
-        plate.health.text:SetText(string.format("%s / %s | %s%%", Abbreviate(rhp), Abbreviate(rhpmax), ceil(hp/hpmax*100)))
+        plate.health.text:SetFormattedText("%s / %s | %s%%", Abbreviate(rhp), Abbreviate(rhpmax), ceil(hp/hpmax*100))
       elseif setting == "deficit" and rhp then
-        plate.health.text:SetText(string.format("-%s" .. (hasdata and "" or "%%"), Abbreviate(rhpmax - rhp)))
+        plate.health.text:SetFormattedText("-%s" .. (hasdata and "" or "%%"), Abbreviate(rhpmax - rhp))
       else -- "percent" as fallback
-        plate.health.text:SetText(string.format("%s%%", ceil(hp/hpmax*100)))
+        plate.health.text:SetFormattedText("%s%%", ceil(hp/hpmax*100))
       end
     else
       plate.health.text:SetText()
@@ -1369,19 +1375,22 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
       for i = 1, 16 do debuffDisplayBuf[i].effect = nil end
       if unitstr then
         local filter = cfg.owndebuffs and "HARMFUL|PLAYER" or "HARMFUL"
-        local auras = C_UnitAuras.GetUnitAuras(unitstr, filter)
         local now = GetTime()
-        for _, aura in ipairs(auras) do
-          if debuffCount >= 16 then break end
+        -- positional UnitAura writes straight into the reusable buffer, so the
+        -- per-plate scan allocates nothing (no per-aura table, no result array)
+        local i = 1
+        while debuffCount < 16 do
+          local aname, icon, count, dispelType, duration, expirationTime = C_UnitAuras.UnitAura(unitstr, i, filter)
+          if not aname then break end
           debuffCount = debuffCount + 1
-          local timeleft = (aura.expirationTime and aura.expirationTime > 0) and (aura.expirationTime - now) or nil
           local b = debuffDisplayBuf[debuffCount]
-          b.effect = aura.name
-          b.texture = aura.icon
-          b.stacks = aura.applications
-          b.dtype = aura.dispelName
-          b.duration = aura.duration
-          b.timeleft = timeleft
+          b.effect = aname
+          b.texture = icon
+          b.stacks = count
+          b.dtype = dispelType
+          b.duration = duration
+          b.timeleft = (expirationTime and expirationTime > 0) and (expirationTime - now) or nil
+          i = i + 1
         end
       end
       for i = 1, 16 do
@@ -1614,7 +1623,7 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
     -- otherwise an NPC sharing a name with a known player flips wait_for_scan
     -- off here, then OnDataChanged re-sets it, every frame until the mob scan
     -- lands.
-    if nameplate.wait_for_scan and GetUnitInfo(name, true, nameplate.cache.player) then
+    if nameplate.wait_for_scan and not nameplate.cache.minion and GetUnitInfo(name, true, nameplate.cache.player) then
       nameplate.wait_for_scan = nil
       update = true
     end
@@ -1763,7 +1772,7 @@ nameplates:RegisterEvent("PLAYER_REGEN_ENABLED")
       rounded = floor(remaining * 100)
       if castbar.lastTextTick ~= rounded then
         castbar.lastTextTick = rounded
-        castbar.text:SetText(string.format("%.2f", remaining))
+        castbar.text:SetFormattedText("%.2f", remaining)
       end
     end
   end
