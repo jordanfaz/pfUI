@@ -362,6 +362,7 @@ for _, line in pairs(text) do
                                                                           { name = "Weapon", rules = "Weapon" },
                                                                           { name = "Armor", rules = "Armor" },
                                                                           { name = "Trinket", rules = "Trinket" },
+                                                                          { name = "Tools", rules = "Tools" },
                                                                           { name = "Consumable", rules = "Consumable" },
                                                                           { name = "Food", rules = "Food" },
                                                                           { name = "Drink", rules = "Drink" },
@@ -369,15 +370,14 @@ for _, line in pairs(text) do
                                                                           { name = "Reagent", rules = "Reagent" },
                                                                           { name = "Recipe", rules = "Recipe" },
                                                                           { name = "Quiver", rules = "Quiver" },
-                                                                          { name = "Keyring", rules = "Keyring" },
                                                                           { name = "Container", rules = "Container" },
                                                                           { name = "Quest", rules = "Quest" },
                                                                           { name = "Class Items", rules = "Class Items" },
                                                                           { name = "Home", rules = "Home" },
-                                                                          { name = "Tools", rules = "Tools" },
-                                                                          { name = "Junk", rules = "Junk" },
                                                                           { name = "Miscellaneous", rules = "Miscellaneous" },
+                                                                          { name = "Junk", rules = "Junk" },
                                                                           { name = "Empty", rules = "Empty" },
+                                                                          { name = "Keyring", rules = "Keyring" },
                                                                         }
                                                                         local defaultCategoryNames = {}
                                                                         for _, category in ipairs(defaultCategories) do
