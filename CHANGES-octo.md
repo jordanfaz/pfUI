@@ -1,16 +1,26 @@
 # Changes on top of brues-code/pfUI
 
 Everything on the `octo` branch that is not in
-[brues-code/pfUI](https://github.com/brues-code/pfUI) — **43 files, +989 / −169**,
-measured against upstream `82c74c2d` (2026-08-21 sync: tooltip aura-caster class colours,
-localized race info, GetCoinTextureString in CreateGoldString, the `handlesHookScript`
-capability flag, and skipping the `pfSellData` declaration on turtle clients). Upstream's
-`685ecb4a`, which drops the `!!!ClassicAPI` toc dependency, is deliberately **not**
-taken — see below.
+[brues-code/pfUI](https://github.com/brues-code/pfUI) — **42 files, +983 / −169**,
+measured against upstream `2b5288a6` (2026-09-01 sync, one commit past release **v9.0.21**).
+Upstream's `685ecb4a`, which drops the `!!!ClassicAPI` toc dependency, is deliberately
+**not** taken — see below.
 
-**The delta shrank by 65 lines at this sync because brues merged the nameplate colour work
-upstream** (`fe5b3b13`, `a7ad1f07`, `a3cfd711`). Those three fixes are no longer divergence;
-they are simply pfUI now, for every user of the ClassicAPI edition. Reported by Iden.
+What came in at the 2026-09-01 sync: positional `C_UnitAuras.UnitAura` reads in the hot
+aura scans (buff, buffwatch, unitframes dispel indicators, nameplate debuffs — no per-aura
+table allocated per plate per frame), official dispel-type colours on buffwatch debuff bars,
+`SetFormattedText` throughout the per-frame text paths, `CreateSimpleTextureMarkup` +
+`CreateGoldString` in the repair tooltip, the tracking module rebuilt on ClassicAPI's
+`C_Tracking` functions (−100 lines), saved variables defaulted with `or {}` instead of
+being overwritten, no `GetUnitInfo` scan for minion nameplates, and the ClassicAPI minimum
+raised to **v1.12.4** (installed here: v1.13.2).
+
+**The delta shrank again at this sync because brues merged two more pieces of this fork
+upstream.** The nameplate colour work (`fe5b3b13`, `a7ad1f07`, `a3cfd711`) shipped as
+upstream release **v9.0.20** — the tag sits on `a3cfd711`, this fork's own commit. Reported
+by Iden. And the click-cast HealComm fix went up as
+[PR #44](https://github.com/brues-code/pfUI/pull/44) (`8796fab6`), which takes
+`libs/libpredict.lua` to **zero divergence** — see section 1.
 
 The delta shrank rather than grew: most of section 1 has been merged upstream (PRs
 [#39](https://github.com/brues-code/pfUI/pull/39) and
@@ -55,7 +65,7 @@ rewrite already solved them, or solved them *better*, and were dropped rather th
 | `modules/swingtimer.lua` | The bar never tracked attack-speed changes — speed was read only when a swing reset the bar, and any hit landing with >20% remaining was discarded as an "extra attack". Under 5/5 Flurry the real swing lands with ~23% still showing, so the module ate legitimate swings, ran the bar to full and froze it there until the following swing ("the bar doesn't keep up"); lower Flurry ranks reset the bar visibly short of full instead. Now the live timers rescale by newSpeed/oldSpeed — mirroring the server's proportional rescale of the remaining swing — via `UNIT_ATTACK_SPEED` **plus a poll on the bar's own 50Hz tick**, because that event never fires for the player on this client (in-game probe: Flurry procced and expired with zero player firings, while the same event arrived for the target unit — the same gap that forces laytya's Quartz to hand-divide by 1.3 on fresh Flurry). The extra-attack guard is time-based (`a6e0e900`): an event is skipped only when it lands within half a period of the last accepted swing — which event echoes (this stack fires `AUTO_ATTACK_SELF` 2-3× per swing) and Windfury-class extras always do, and a real swing after a bogus re-arm never does, so a desynced bar resyncs within one swing. `/run pfSwingDebug=1` traces every reset/skip decision with armed duration and landing point. Verified in game 2026-08-13 (Seal of the Crusader on/off: rescale 2.77↔1.98 exact, all swings landing 0-5%). Reported by a warrior via Discord. (`17c679e4`) Follow-up (`976d748f`): dual-wield hand attribution treats `HITINFO_LEFTSWING` as trusted only after one flagged off-hand hit has been seen (servers that never set it would otherwise let mixed-speed off-hand hits reset the MH bar mid-fill), and `PLAYER_ENTER_COMBAT`/`PLAYER_LEAVE_COMBAT` now back `autoAttackActive` — the `START_AUTOATTACK`/`STOP_AUTOATTACK` events the module listened for exist in **no DLL on this stack**, so the flag could never become true; both clocks are seeded on enter-combat. In-game probe (2026-08-13): auto-attack events and the LEFTSWING flag verified working (`hi=2`/`hi=6` alternation). |
 | `modules/thirdparty-vanilla.lua` | `HookAddonOrVariable("SortBags")` fires on the folder loading (or any same-named global), not on `SortBags()` existing — a SortBags build with a different entry point rebound pfUI's sort button to a nil global (*attempt to call global 'SortBags'* on every click, reported by Giglili). The handover now bails unless `type(SortBags) == "function"`, keeping pfUI's own libbagsort sorter bound. (`c0f9810`) |
 | `modules/buffwatch.lua` | `fcache` is built once per config table and never invalidated, so ctrl/shift-clicking a skill onto the whitelist or blacklist did nothing until reload. (`f65f897c`) |
-| `libs/libpredict.lua` | Heals cast through ClassicAPI's attribute-driven click-casting were invisible to HealComm — no broadcast, no local incoming-heal prediction — while QuickHeal's worked. The attribute engine casts inside the DLL, so the `CastSpell`/`CastSpellByName` hooks that fill the announce queue never ran, and the `SPELL_START_SELF` gate skipped the heal. The queue is now rebuilt from the event's own spellId (name + rank, same cache key) whenever the hooks were bypassed; the click target was already resolved via the pending-cast GUID. Instant HoTs were unaffected (event-driven go-hook). Reported by a player 2026-08-14 and **verified in game by the reporter the same day** ("works!"). (`2134ce7b`) |
+| `libs/libpredict.lua` | Heals cast through ClassicAPI's attribute-driven click-casting were invisible to HealComm — no broadcast, no local incoming-heal prediction — while QuickHeal's worked. The attribute engine casts inside the DLL, so the `CastSpell`/`CastSpellByName` hooks that fill the announce queue never ran, and the `SPELL_START_SELF` gate skipped the heal. The queue is now rebuilt from the event's own spellId (name + rank, same cache key) whenever the hooks were bypassed; the click target was already resolved via the pending-cast GUID. Instant HoTs were unaffected (event-driven go-hook). Reported by a player 2026-08-14 and **verified in game by the reporter the same day** ("works!"). (`2134ce7b`) **Merged upstream 2026-08-24 as [PR #44](https://github.com/brues-code/pfUI/pull/44) (`8796fab6`), and upstream's version was taken over ours at the 2026-09-01 sync.** His is the same fix without the two conditions: the queue is rebuilt unconditionally rather than only when `spell_queue[1] ~= spellName`, and without requiring `cache[fullName]` to already exist. That guard was a latent trap — a heal only ever cast by click could never be learned, because `UpdateCache` at the far end gates on `spell_queue[1] == spellName`, which our guard would never let become true for an uncached spell. Deriving the rank from the event's own spellId also fixes stale-rank lookups after a keybind cast of a different rank. Dropping our `spell_queue[3]` write costs nothing: `libpredict.sender.current_cast_target` is set from the same `target` on every `SPELL_START_SELF` and is read first everywhere `spell_queue[3]` is a fallback. |
 | `modules/firstrun.lua` | Three chat-setup steps printed "Chat module is disabled" and then carried on into the nil `pfUI.chat` they had just tested for. (`1af427e3`) |
 | `libs/libpredict.lua` | ~~`UKNOWNBEING` / `UNKOWNBEING` — misspelled, so both resolve to nil.~~ **Wrong — reverted 2026-08-10.** `UKNOWNBEING` is Blizzard's own misspelling and *is* the real 1.12 global; `UNKNOWNBEING` does not exist. "Correcting" it turned two working guards into dead ones. `UNKOWNBEING` alone was the genuine typo. BigWigs' RosterLib and StatCompare both use `UKNOWNBEING` — the check I should have made. Merged upstream, then fixed by brues in `b6931359`. |
 | `modules/superwow.lua` | `SUPERWOW_VERSION == "1.5"` exact string compare. **Not hypothetical — SuperWoW here is 2.2** (`SUPERWOW_VERSION="2.2"` is embedded in `SuperWoWhook.dll`), so the test was already false and the GUID-to-name combat-text hook was dead. (`82a37752`) |
