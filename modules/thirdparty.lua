@@ -374,6 +374,133 @@ pfUI:RegisterModule("thirdparty", function()
     end
   end)
 
+  -- CombatLedger Meter
+  HookAddonOrVariable("CombatLedger", function()
+  if CombatLedger.SetSetting then CombatLedger.SetSetting("pfuiDock", false) end
+
+	  local function GetFrame(id)
+	  return CombatLedger.UIWindows and CombatLedger.UIWindows[id] and CombatLedger.UIWindows[id].frame
+	  end
+
+	  local function GetSecondaryFrame()
+	  local firstID, firstNumber
+	  for id in pairs(CombatLedger.UIWindows or {}) do
+		  local number = tonumber(string.match(id, "^window(%d+)$"))
+		  if number and (not firstNumber or number < firstNumber) then
+			  firstID, firstNumber = id, number
+			  end
+			  end
+			  return firstID and GetFrame(firstID)
+			  end
+
+			  local function Relayout(frame)
+			  if frame and frame.barParent then
+				  frame.barParent:SetWidth(frame:GetWidth() - 12)
+				  end
+				  if CombatLedger.UI and CombatLedger.UI.RefreshAllInstances then
+					  CombatLedger.UI.RefreshAllInstances()
+					  elseif CombatLedger.UI and CombatLedger.UI.Refresh then
+						  CombatLedger.UI.Refresh()
+						  end
+						  end
+
+						  local function BuildDock(name, getframe, left)
+						  return { "combatledger", "CombatLedger", name,
+							  function() -- single: fill the panel
+							  local frame = getframe()
+							  if not frame then return end
+								  frame:ClearAllPoints()
+								  frame:SetAllPoints(pfUI.chat.right)
+								  frame:SetWidth(pfUI.chat.right:GetWidth())
+								  Relayout(frame)
+								  end,
+								  function() -- dual: take one half
+								  local frame = getframe()
+								  if not frame then return end
+									  frame:ClearAllPoints()
+									  if left then
+										  frame:SetPoint("TOPLEFT", pfUI.chat.right, "TOPLEFT", 0, 0)
+										  frame:SetPoint("BOTTOMRIGHT", pfUI.chat.right, "BOTTOM", 0, 0)
+										  else
+											  frame:SetPoint("TOPLEFT", pfUI.chat.right, "TOP", 0, 0)
+											  frame:SetPoint("BOTTOMRIGHT", pfUI.chat.right, "BOTTOMRIGHT", 0, 0)
+											  end
+											  frame:SetWidth(pfUI.chat.right:GetWidth() / 2)
+											  Relayout(frame)
+											  end,
+											  function() -- show
+											  local frame = getframe()
+											  if frame then frame:Show() Relayout(frame) end
+												  end,
+												  function() -- hide
+												  local frame = getframe()
+												  if frame then frame:Hide() end
+													  end
+						  }
+						  end
+
+						  local damageDock = BuildDock("CombatLedgerMainWindow", function() return GetFrame("main") end, false)
+						  local threatDock = BuildDock("CombatLedgerSecondaryWindow", GetSecondaryFrame, true)
+						  local registered
+
+						  local function SyncSecond()
+						  if not registered then return end
+							  if GetSecondaryFrame() and not pfUI.thirdparty.meters.threat then
+								  pfUI.thirdparty.meters:RegisterMeter("threat", threatDock)
+								  elseif not GetSecondaryFrame() and pfUI.thirdparty.meters.threat == threatDock then
+									  pfUI.thirdparty.meters.threat = nil
+									  end
+									  pfUI.thirdparty.meters:Resize()
+
+									  local main, secondary = GetFrame("main"), GetSecondaryFrame()
+									  if secondary then
+										  if main and main:IsShown() then secondary:Show() Relayout(secondary) else secondary:Hide() end
+											  end
+											  end
+
+											  function pfUI.thirdparty:RegisterCombatLedgerDock()
+											  if registered or C.thirdparty.combatledger.dock ~= "1" then return end
+												  pfUI.thirdparty.meters:RegisterMeter("damage", damageDock)
+												  registered = pfUI.thirdparty.meters.damage == damageDock
+												  SyncSecond()
+												  end
+
+												  function pfUI.thirdparty:UndockCombatLedger()
+												  local function UndockFrame(frame)
+												  if frame then
+													  frame:ClearAllPoints()
+													  frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+													  frame:Show()
+													  end
+													  end
+													  UndockFrame(GetFrame("main"))
+													  UndockFrame(GetSecondaryFrame())
+													  Relayout(GetFrame("main"))
+													  end
+
+													  if CombatLedger.UI then
+														  local createExtraWindow = CombatLedger.UI.CreateExtraWindow
+														  CombatLedger.UI.CreateExtraWindow = function(...)
+														  local id = createExtraWindow(...)
+														  SyncSecond()
+														  return id
+														  end
+
+														  local closeExtraWindow = CombatLedger.UI.CloseExtraWindow
+														  CombatLedger.UI.CloseExtraWindow = function(...)
+														  closeExtraWindow(...)
+														  SyncSecond()
+														  end
+
+														  local restoreAllWindows = CombatLedger.UI.RestoreAllWindows
+														  CombatLedger.UI.RestoreAllWindows = function(...)
+														  restoreAllWindows(...)
+														  SyncSecond()
+														  end
+														  end
+
+														  pfUI.thirdparty:RegisterCombatLedgerDock()
+														  end)
   -- DPSMate Damage Meter
   -- Vanilla: https://github.com/Geigerkind/DPSMate
   -- TBC: https://github.com/Geigerkind/DPSMateTBC
