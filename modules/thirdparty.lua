@@ -4,6 +4,11 @@ pfUI:RegisterModule("thirdparty", function()
   -- dockframe of the chat panel aswell as the thirdparty root-table.
   -- For vanilla-specific glue, see: thirdparty-vanilla.
 
+  -- backfill for profiles saved before this option existed
+  if not C.thirdparty.combatledger then
+    C.thirdparty.combatledger = { dock = "1" }
+  end
+
   pfUI.thirdparty = {}
 
   do -- addon dockframe
