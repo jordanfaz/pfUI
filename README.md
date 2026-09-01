@@ -1,3 +1,15 @@
+> ### This repository was `pfUI-classicAPI` until 2026-09-01
+>
+> **If pfUI stopped loading after an update, you are on the wrong build for your client.**
+> The name `roby-brok/pfUI` used to hold the pre-ClassicAPI build; the two swapped names.
+> GitHub drops a rename redirect once the freed name is reused, so an existing
+> `roby-brok/pfUI` remote now pulls *this* build rather than the old one.
+>
+> This build **requires `ClassicAPI.dll`** and disables itself with a popup without it. If
+> you cannot run the DLL, the old build is
+> **[roby-brok/pfUI-legacy](https://github.com/roby-brok/pfUI-legacy)** — point your remote
+> there and it will keep working as before.
+
 > ### Attribution
 >
 > **This is a downstream fork. Almost none of the work here is mine.**
@@ -75,7 +87,7 @@ This version includes significant performance improvements and DLL-enhanced feat
 
 **Download**
 
-1. Grab the [latest code](https://github.com/roby-brok/pfUI-classicAPI/archive/refs/heads/octo.zip) (branch `octo`)
+1. Grab the [latest code](https://github.com/roby-brok/pfUI/archive/refs/heads/octo.zip) (branch `octo`)
 2. Unpack the zip — you get a folder called `pfUI-classicAPI-octo`
 3. **Rename it to `pfUI`**
 4. Move it into `Wow-Directory\Interface\AddOns`
@@ -85,7 +97,7 @@ This version includes significant performance improvements and DLL-enhanced feat
 
 ```sh
 cd Wow-Directory/Interface/AddOns
-git clone -b octo https://github.com/roby-brok/pfUI-classicAPI.git pfUI
+git clone -b octo https://github.com/roby-brok/pfUI.git pfUI
 ```
 
 That trailing `pfUI` is what names the folder correctly.
@@ -196,7 +208,7 @@ ClassicAPI DLL. If the OctoWoW patches in *this* fork have been useful to you, m
 fork is a thin layer on top; almost every bug belongs in
 [brues-code's tracker](https://github.com/brues-code/pfUI/issues), and reporting it there
 gets it fixed for everyone rather than just for OctoWoW. Only open an issue
-[here](https://github.com/roby-brok/pfUI-classicAPI/issues) if it is specific to something
+[here](https://github.com/roby-brok/pfUI/issues) if it is specific to something
 listed in [CHANGES-octo.md](CHANGES-octo.md).
 
 Either way — please provide as much information as possible.
