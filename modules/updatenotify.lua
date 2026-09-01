@@ -13,7 +13,7 @@ pfUI:RegisterModule("updatenotify", function ()
   -- 2026-08-11 sync; v9.0.19's tag commit 74fbbb61 came in with the
   -- 2026-08-14 merge). Encoded major*10000 + minor*100 + fix. (Same
   -- pattern as OWThreat's compatVer.)
-  local localversion  = 90019 -- brues-code/pfUI v9.0.19
+  local localversion  = 90021 -- brues-code/pfUI v9.0.21
   local remoteversion = tonumber(pfUI_init.updateavailable) or 0
   local loginchannels = { "BATTLEGROUND", "RAID", "GUILD" }
   local groupchannels = { "BATTLEGROUND", "RAID" }
